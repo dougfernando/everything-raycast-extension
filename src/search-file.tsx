@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Icon, List, open, showToast, Toast } from "@raycast/api"
+import { Action, ActionPanel, FileIcon, Icon, List, open, showToast, Toast } from "@raycast/api"
 import { useCachedPromise } from "@raycast/utils"
 import { execFile } from "child_process" // Changed from exec
 import { promisify } from "util"
@@ -74,9 +74,8 @@ async function openFileFound(fileInfo: FileInfo) {
         })
     }
 }
-
-function getFileIcon(): string {
-    return Icon.Document
+function getFileIcon(filePath: string) {
+    return { fileIcon: filePath }
 }
 
 export default function Command() {
@@ -100,7 +99,7 @@ export default function Command() {
                         key={file.commandline}
                         title={file.name}
                         subtitle={file.commandline}
-                        icon={getFileIcon()}
+                        icon={getFileIcon(file.commandline)}
                         actions={
                             <ActionPanel>
                                 <Action title="Open File" icon={Icon.Desktop} onAction={() => openFileFound(file)} />
