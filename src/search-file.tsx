@@ -22,8 +22,8 @@ async function loadFilesList(searchText: string): Promise<FileInfo[]> {
     try {
         const executable = "es.exe"
         // Pass arguments as an array to avoid shell parsing issues
-        const args = ["-n", "100", searchText]
-
+        // const args = ["-n", "100", searchText]
+        const args = ["-n", "100", ...searchText.split(/\s+/).filter(word => word.length > 0)]
         // Execute the command directly using execFileAsync
         const { stdout } = await execFileAsync(executable, args)
 
