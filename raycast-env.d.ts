@@ -8,12 +8,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
 type ExtensionPreferences = {
-  /** Settings Path - Path to file */
-  "settingsPath": string,
-  /** Profile Sort Order - Choose how the sorting order of the profiles is determined */
-  "sortOrder": "alphabetical" | "settings",
-  /** Quake Mode - Open all profiles in Quake Mode */
-  "quakeMode": boolean
+  /** Should start with empty list? - Decides if the search should start with an empty list or not */
+  "emptyStart": boolean
 }
 
 /** Preferences accessible in all the extension's commands */

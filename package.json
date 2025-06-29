@@ -22,35 +22,9 @@
     ],
     "preferences": [
         {
-            "name": "settingsPath",
-            "title": "Settings Path",
-            "description": "Path to file",
-            "type": "textfield",
-            "default": "...",
-            "required": true
-        },
-        {
-            "name": "sortOrder",
-            "title": "Profile Sort Order",
-            "description": "Choose how the sorting order of the profiles is determined",
-            "type": "dropdown",
-            "required": true,
-            "default": "alphabetical",
-            "data": [
-                {
-                    "title": "Alphabetical",
-                    "value": "alphabetical"
-                },
-                {
-                    "title": "Settings Order",
-                    "value": "settings"
-                }
-            ]
-        },
-        {
-            "name": "quakeMode",
-            "title": "Quake Mode",
-            "description": "Open all profiles in Quake Mode",
+            "name": "emptyStart",
+            "title": "Should start with empty list?",
+            "description": "Decides if the search should start with an empty list or not",
             "type": "checkbox",
             "required": false,
             "default": false
