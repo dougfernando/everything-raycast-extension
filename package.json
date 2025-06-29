@@ -1,0 +1,78 @@
+{
+    "$schema": "https://www.raycast.com/schemas/extension.json",
+    "name": "everything-ext",
+    "title": "Everything extension",
+    "description": "Search files using everything",
+    "icon": "icon.png",
+    "author": "dfs",
+    "categories": [
+        "Developer Tools"
+    ],
+    "license": "MIT",
+    "platforms": [
+        "windows"
+    ],
+    "commands": [
+        {
+            "name": "search-file",
+            "title": "Search files using everything",
+            "description": "Search files using everything",
+            "mode": "view"
+        }
+    ],
+    "preferences": [
+        {
+            "name": "settingsPath",
+            "title": "Settings Path",
+            "description": "Path to file",
+            "type": "textfield",
+            "default": "...",
+            "required": true
+        },
+        {
+            "name": "sortOrder",
+            "title": "Profile Sort Order",
+            "description": "Choose how the sorting order of the profiles is determined",
+            "type": "dropdown",
+            "required": true,
+            "default": "alphabetical",
+            "data": [
+                {
+                    "title": "Alphabetical",
+                    "value": "alphabetical"
+                },
+                {
+                    "title": "Settings Order",
+                    "value": "settings"
+                }
+            ]
+        },
+        {
+            "name": "quakeMode",
+            "title": "Quake Mode",
+            "description": "Open all profiles in Quake Mode",
+            "type": "checkbox",
+            "required": false,
+            "default": false
+        }
+    ],
+    "dependencies": {
+        "@raycast/api": "^1.40.0",
+        "@raycast/utils": "^1.4.8"
+    },
+    "devDependencies": {
+        "@raycast/eslint-config": "^1.0.6",
+        "@types/node": "18.18.4",
+        "@types/react": "19.0.10",
+        "eslint": "^8.51.0",
+        "prettier": "^3.0.3",
+        "typescript": "^5.2.2"
+    },
+    "scripts": {
+        "build": "ray build -e dist",
+        "dev": "ray develop",
+        "fix-lint": "ray lint --fix",
+        "lint": "ray lint",
+        "publish": "ray publish"
+    }
+}
