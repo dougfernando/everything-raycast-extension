@@ -2,7 +2,7 @@
 
 ![short demo](./assets/demo.gif)
 
-Based on https://github.com/PuttTim/windows-terminal
+Based on https://github.com/PuttTim/windows-terminal project structure & setup
 
 to install it:
 - install Node JS (winget install -e --id OpenJS.NodeJS)
