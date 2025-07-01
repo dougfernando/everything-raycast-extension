@@ -1,7 +1,7 @@
 {
     "$schema": "https://www.raycast.com/schemas/extension.json",
     "name": "everything-ext",
-    "title": "Everything extension",
+    "title": "Everything",
     "description": "Search files using everything",
     "icon": "icon.png",
     "author": "dfs",
