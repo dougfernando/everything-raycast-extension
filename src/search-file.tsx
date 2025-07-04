@@ -1,12 +1,13 @@
 import { Action, ActionPanel, getPreferenceValues, Icon, List, open, showToast, Toast } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
-import { execFile } from "child_process";
+import { exec, execFile } from "child_process"; // Import 'exec'
 import { lstat, readFile, Stats } from "fs/promises";
 import { promisify } from "util";
 import { basename, dirname, extname } from "path";
 import { useState } from "react";
-import iconv from "iconv-lite";
 
+// Promisify both exec and execFile
+const execAsync = promisify(exec);
 const execFileAsync = promisify(execFile);
 
 const PREVIEWABLE_EXTENSIONS = [".md", ".txt", ".js", ".ts", ".tsx", ".json", ".html", ".css", ".xml", ".log"];
@@ -30,21 +31,21 @@ interface Preferences {
     useCustomExplorerAsDefault?: boolean;
 }
 
+// --- FINAL ATTEMPT: Using 'exec' to force a UTF-8 environment ---
 async function loadFilesList(searchText: string): Promise<FileInfo[]> {
     if (!searchText) {
         return [];
     }
 
     try {
-        const executable = "es.exe";
-        const args = ["-n", "100", ...searchText.split(/\s+/).filter((word) => word.length > 0)];
+        // Sanitize search text to be passed as a single argument
+        const sanitizedSearch = `"${searchText.replace(/"/g, '""')}"`;
+        // Construct a command that forces the shell's codepage to UTF-8 (65001) before running es.exe
+        const command = `chcp 65001 > nul && es.exe -n 100 ${sanitizedSearch}`;
 
-        const { stdout } = await execFileAsync(executable, args, { encoding: "buffer" });
+        const { stdout } = await execAsync(command);
 
-        // --- UPDATED: Changed the decoding to the correct Portuguese OEM codepage ---
-        const decodedStdout = iconv.decode(stdout, "cp860");
-
-        const filePaths = decodedStdout
+        const filePaths = stdout
             .trim()
             .split(/\r?\n/)
             .filter((path) => path);
