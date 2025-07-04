@@ -8,8 +8,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
 type ExtensionPreferences = {
-  /** Should start with empty list? - Decides if the search should start with an empty list or not */
-  "emptyStart": boolean
+  /** Custom File Explorer Command - Custom command to open directories. Use %s as a placeholder for the path. */
+  "fileExplorerCommand": string,
+  /** Use Custom Explorer as Default Action - If enabled, the primary action will be to open the file's location in your custom explorer. */
+  "useCustomExplorerAsDefault": boolean
 }
 
 /** Preferences accessible in all the extension's commands */
