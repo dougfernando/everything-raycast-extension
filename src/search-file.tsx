@@ -1,12 +1,11 @@
 import { Action, ActionPanel, getPreferenceValues, Icon, List, open, showToast, Toast } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
-import { exec, execFile } from "child_process"; // Import 'exec'
+import { exec, execFile } from "child_process";
 import { lstat, readFile, Stats } from "fs/promises";
 import { promisify } from "util";
 import { basename, dirname, extname } from "path";
 import { useState } from "react";
 
-// Promisify both exec and execFile
 const execAsync = promisify(exec);
 const execFileAsync = promisify(execFile);
 
@@ -31,17 +30,15 @@ interface Preferences {
     useCustomExplorerAsDefault?: boolean;
 }
 
-// --- FINAL ATTEMPT: Using 'exec' to force a UTF-8 environment ---
 async function loadFilesList(searchText: string): Promise<FileInfo[]> {
     if (!searchText) {
         return [];
     }
 
     try {
-        // Sanitize search text to be passed as a single argument
-        const sanitizedSearch = `"${searchText.replace(/"/g, '""')}"`;
-        // Construct a command that forces the shell's codepage to UTF-8 (65001) before running es.exe
-        const command = `chcp 65001 > nul && es.exe -n 100 ${sanitizedSearch}`;
+        // --- UPDATED: Removed incorrect sanitization to correctly handle space-separated search terms ---
+        // The shell will correctly interpret the searchText as multiple arguments
+        const command = `chcp 65001 > nul && es.exe -n 100 ${searchText}`;
 
         const { stdout } = await execAsync(command);
 
@@ -108,15 +105,6 @@ async function showInExplorer(path: string) {
     }
 
     if (fileExplorerCommand) {
-        if (!fileExplorerCommand.includes("%s")) {
-            await showToast({
-                style: Toast.Style.Failure,
-                title: "Configuration Error",
-                message: "Your custom explorer command in preferences is missing the '%s' placeholder.",
-            });
-            return;
-        }
-
         try {
             const commandParts = fileExplorerCommand.match(/"[^"]+"|\S+/g) || [];
             if (commandParts.length === 0) {
@@ -136,7 +124,7 @@ async function showInExplorer(path: string) {
             });
         }
     } else {
-        open(targetPath);
+        await open(targetPath);
     }
 }
 
