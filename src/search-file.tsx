@@ -5,6 +5,7 @@ import { lstat, readFile, Stats } from "fs/promises";
 import { promisify } from "util";
 import { basename, dirname, extname } from "path";
 import { useState } from "react";
+import iconv from "iconv-lite";
 
 const execFileAsync = promisify(execFile);
 
@@ -37,9 +38,13 @@ async function loadFilesList(searchText: string): Promise<FileInfo[]> {
     try {
         const executable = "es.exe";
         const args = ["-n", "100", ...searchText.split(/\s+/).filter((word) => word.length > 0)];
-        const { stdout } = await execFileAsync(executable, args);
 
-        const filePaths = stdout
+        const { stdout } = await execFileAsync(executable, args, { encoding: "buffer" });
+
+        // --- UPDATED: Changed the decoding to the correct Portuguese OEM codepage ---
+        const decodedStdout = iconv.decode(stdout, "cp860");
+
+        const filePaths = decodedStdout
             .trim()
             .split(/\r?\n/)
             .filter((path) => path);
@@ -223,13 +228,10 @@ export default function Command() {
                             </ActionPanel.Section>
                         </ActionPanel>
                     }
-                    // --- UPDATED: The detail prop now provides both markdown and metadata ---
                     detail={
                         isShowingDetail && (
                             <List.Item.Detail
-                                // The markdown prop will show the file preview if it exists
                                 markdown={previewContent ?? undefined}
-                                // The metadata prop will always show the file stats if they exist
                                 metadata={
                                     selectedFileStats && (
                                         <List.Item.Detail.Metadata>
