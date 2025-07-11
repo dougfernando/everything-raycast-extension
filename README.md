@@ -4,6 +4,8 @@
 
 Based on https://github.com/PuttTim/windows-terminal project structure & setup
 
+I used Everything CLI, so in theory, every es.exe command line argument for filtering should work.
+
 to install it:
 - install Node JS (winget install -e --id OpenJS.NodeJS)
 - install Everything CLI (winget install --id=voidtools.Everything.Cli -e)
