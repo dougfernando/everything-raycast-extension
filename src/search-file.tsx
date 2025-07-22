@@ -83,6 +83,38 @@ function formatBytes(bytes: number, decimals = 2) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
 }
 
+function truncatePath(path: string, maxLength: number = 50): string {
+    if (path.length <= maxLength) return path
+    
+    const pathSeparator = path.includes('\\') ? '\\' : '/'
+    const parts = path.split(pathSeparator)
+    
+    if (parts.length <= 3) return path
+    
+    // Always keep the first two parts (drive + first folder) and last part
+    const first = parts[0]
+    const second = parts[1]
+    const last = parts[parts.length - 1]
+    const ellipsis = '...'
+    
+    // Build: first + separator + second + separator + ellipsis + separator + last
+    const basicTruncated = `${first}${pathSeparator}${second}${pathSeparator}${ellipsis}${pathSeparator}${last}`
+    if (basicTruncated.length <= maxLength) {
+        return basicTruncated
+    }
+    
+    // If still too long, truncate the last part
+    const fixedPart = `${first}${pathSeparator}${second}${pathSeparator}${ellipsis}${pathSeparator}`
+    const availableSpace = maxLength - fixedPart.length
+    if (availableSpace > 0) {
+        const truncatedLast = last.length > availableSpace ? last.substring(0, availableSpace - 3) + '...' : last
+        return `${fixedPart}${truncatedLast}`
+    }
+    
+    // If extremely long, just show first two parts with ellipsis
+    return `${first}${pathSeparator}${second}${pathSeparator}${ellipsis}`
+}
+
 function parseEsDate(dateStr: string): Date | undefined {
     if (!dateStr) return undefined
 
@@ -282,7 +314,7 @@ export default function Command() {
                     key={file.commandline}
                     id={file.commandline}
                     title={file.name}
-                    subtitle={isShowingDetail ? basename(dirname(file.commandline)) : dirname(file.commandline)}
+                    subtitle={isShowingDetail ? basename(dirname(file.commandline)) : truncatePath(dirname(file.commandline))}
                     icon={{ fileIcon: file.commandline }}
                     accessories={[
                         {
