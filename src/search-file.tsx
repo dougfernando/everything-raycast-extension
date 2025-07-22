@@ -11,20 +11,48 @@ const execFileAsync = promisify(execFile)
 
 // Known text file extensions for fast path detection
 const KNOWN_TEXT_EXTENSIONS = new Set([
-    '.txt', '.md', '.json', '.xml', '.html', '.css', '.js', '.ts', 
-    '.tsx', '.jsx', '.log', '.yaml', '.yml', '.toml', '.ini', '.cfg',
-    '.py', '.java', '.c', '.cpp', '.h', '.php', '.rb', '.go', '.rs', 
-    '.sh', '.bat', '.ps1', '.sql', '.csv', '.conf', '.properties'
+    ".txt",
+    ".md",
+    ".json",
+    ".xml",
+    ".html",
+    ".css",
+    ".js",
+    ".ts",
+    ".tsx",
+    ".jsx",
+    ".log",
+    ".yaml",
+    ".yml",
+    ".toml",
+    ".ini",
+    ".cfg",
+    ".py",
+    ".java",
+    ".c",
+    ".cpp",
+    ".h",
+    ".php",
+    ".rb",
+    ".go",
+    ".rs",
+    ".sh",
+    ".bat",
+    ".ps1",
+    ".sql",
+    ".csv",
+    ".conf",
+    ".properties",
 ])
 
 async function isTextFile(filePath: string): Promise<boolean> {
     try {
         const buffer = await readFile(filePath, { encoding: null })
         const sample = buffer.slice(0, Math.min(512, buffer.length))
-        
+
         // Check for null bytes (binary indicator)
         const nullBytes = sample.filter(byte => byte === 0).length
-        
+
         // If more than 1% null bytes, likely binary
         return nullBytes / sample.length < 0.01
     } catch {
@@ -34,15 +62,15 @@ async function isTextFile(filePath: string): Promise<boolean> {
 
 async function isFilePreviewable(filePath: string, fileSize?: number): Promise<boolean> {
     const ext = extname(filePath).toLowerCase()
-    
+
     // Known text extensions - fast path
     if (KNOWN_TEXT_EXTENSIONS.has(ext)) return true
-    
+
     // Unknown extension or no extension - content detection for small files only
     if ((!ext || !KNOWN_TEXT_EXTENSIONS.has(ext)) && fileSize && fileSize < 10000) {
         return await isTextFile(filePath)
     }
-    
+
     return false
 }
 
@@ -254,8 +282,13 @@ export default function Command() {
                     key={file.commandline}
                     id={file.commandline}
                     title={file.name}
-                    subtitle={isShowingDetail ? basename(dirname(file.commandline)) : file.commandline}
+                    subtitle={isShowingDetail ? basename(dirname(file.commandline)) : dirname(file.commandline)}
                     icon={{ fileIcon: file.commandline }}
+                    accessories={[
+                        {
+                            text: formatBytes(file.size || 0),
+                        },
+                    ]}
                     actions={
                         <ActionPanel>
                             <ActionPanel.Section>
