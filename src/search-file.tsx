@@ -136,6 +136,7 @@ interface FileInfo {
 }
 
 interface Preferences {
+    esExePath?: string
     fileExplorerCommand?: string
     useCustomExplorerAsDefault?: boolean
 }
@@ -146,8 +147,11 @@ async function loadFilesList(searchText: string): Promise<FileInfo[]> {
     }
 
     try {
+        const { esExePath } = getPreferenceValues<Preferences>()
+        const esCommand = esExePath || "es.exe"
+
         // Use es.exe with CSV output format to get file info in one call
-        const command = `chcp 65001 > nul && es.exe -n 100 -csv -name -filename-column -size -date-created -date-modified ${searchText}`
+        const command = `chcp 65001 > nul && "${esCommand}" -n 100 -csv -name -filename-column -size -date-created -date-modified ${searchText}`
 
         const { stdout } = await execAsync(command)
 
@@ -190,17 +194,25 @@ async function loadFilesList(searchText: string): Promise<FileInfo[]> {
         })
     } catch (error) {
         console.log(error)
-        if (error instanceof Error && "code" in error && (error as any).code === "ENOENT") {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        const hasStderr = error && typeof error === 'object' && 'stderr' in error
+        const stderr = hasStderr ? String((error as any).stderr) : ""
+        
+        // Check if es.exe command is not recognized (Windows) or not found (Unix-like)
+        if (stderr.includes("not recognized") || stderr.includes("command not found") || errorMessage.includes("not recognized")) {
+            const { esExePath } = getPreferenceValues<Preferences>()
             await showToast({
                 style: Toast.Style.Failure,
-                title: "'es.exe' not found",
-                message: "Please ensure Everything's command-line tool is in your system's PATH.",
+                title: esExePath ? "Custom es.exe path not found" : "'es.exe' not found",
+                message: esExePath
+                    ? `Cannot find es.exe at: ${esExePath}`
+                    : "Please ensure Everything's command-line tool is in your system's PATH or set a custom path in preferences.",
             })
         } else {
             await showToast({
                 style: Toast.Style.Failure,
                 title: "Error Searching Files",
-                message: error instanceof Error ? error.message : "An unknown error occurred",
+                message: errorMessage,
             })
         }
         return []

@@ -22,6 +22,15 @@
     ],
     "preferences": [
         {
+            "name": "esExePath",
+            "title": "Everything CLI Path (es.exe)",
+            "description": "Custom path to es.exe. Leave empty to use system PATH.",
+            "type": "textfield",
+            "required": false,
+            "default": "",
+            "placeholder": "C:\\Program Files\\Everything\\es.exe"
+        },
+        {
             "name": "fileExplorerCommand",
             "title": "Custom File Explorer Command",
             "description": "Custom command to open directories. Use %s as a placeholder for the path.",
