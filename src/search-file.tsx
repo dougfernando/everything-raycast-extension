@@ -9,7 +9,42 @@ import { useState } from "react"
 const execAsync = promisify(exec)
 const execFileAsync = promisify(execFile)
 
-const PREVIEWABLE_EXTENSIONS = [".md", ".txt", ".js", ".ts", ".tsx", ".json", ".html", ".css", ".xml", ".log"]
+// Known text file extensions for fast path detection
+const KNOWN_TEXT_EXTENSIONS = new Set([
+    '.txt', '.md', '.json', '.xml', '.html', '.css', '.js', '.ts', 
+    '.tsx', '.jsx', '.log', '.yaml', '.yml', '.toml', '.ini', '.cfg',
+    '.py', '.java', '.c', '.cpp', '.h', '.php', '.rb', '.go', '.rs', 
+    '.sh', '.bat', '.ps1', '.sql', '.csv', '.conf', '.properties'
+])
+
+async function isTextFile(filePath: string): Promise<boolean> {
+    try {
+        const buffer = await readFile(filePath, { encoding: null })
+        const sample = buffer.slice(0, Math.min(512, buffer.length))
+        
+        // Check for null bytes (binary indicator)
+        const nullBytes = sample.filter(byte => byte === 0).length
+        
+        // If more than 1% null bytes, likely binary
+        return nullBytes / sample.length < 0.01
+    } catch {
+        return false
+    }
+}
+
+async function isFilePreviewable(filePath: string, fileSize?: number): Promise<boolean> {
+    const ext = extname(filePath).toLowerCase()
+    
+    // Known text extensions - fast path
+    if (KNOWN_TEXT_EXTENSIONS.has(ext)) return true
+    
+    // Unknown extension or no extension - content detection for small files only
+    if ((!ext || !KNOWN_TEXT_EXTENSIONS.has(ext)) && fileSize && fileSize < 10000) {
+        return await isTextFile(filePath)
+    }
+    
+    return false
+}
 
 function formatBytes(bytes: number, decimals = 2) {
     if (bytes === 0) return "0 Bytes"
@@ -184,7 +219,8 @@ export default function Command() {
             setSelectedFile(fileInfo)
 
             // Try to load preview for previewable files
-            if (PREVIEWABLE_EXTENSIONS.includes(extname(itemId).toLowerCase())) {
+            const canPreview = await isFilePreviewable(itemId, fileInfo.size)
+            if (canPreview) {
                 try {
                     const content = await readFile(itemId, "utf-8")
                     setPreviewContent(content)
