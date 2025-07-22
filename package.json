@@ -1,61 +1,70 @@
 {
-  "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "everything-ext",
-  "title": "Everything",
-  "description": "Search files using everything",
-  "icon": "icon.png",
-  "author": "dfs",
-  "categories": [
-    "Developer Tools"
-  ],
-  "license": "MIT",
-  "platforms": [
-    "Windows"
-  ],
-  "commands": [
-    {
-      "name": "search-file",
-      "title": "Search files using everything",
-      "description": "Search files using everything",
-      "mode": "view"
-    }
-  ],
-  "preferences": [
-    {
-      "name": "fileExplorerCommand",
-      "title": "Custom File Explorer Command",
-      "description": "Custom command to open directories. Use %s as a placeholder for the path.",
-      "type": "textfield",
-      "required": false,
-      "default": "",
-      "placeholder": "\"C:\\Program Files\\Explorer\\App.exe\" -arg %s"
+    "$schema": "https://www.raycast.com/schemas/extension.json",
+    "name": "everything-ext",
+    "title": "Everything",
+    "description": "Search files using everything",
+    "icon": "icon.png",
+    "author": "dfs",
+    "categories": [
+        "Developer Tools"
+    ],
+    "license": "MIT",
+    "platforms": [
+        "Windows"
+    ],
+    "commands": [
+        {
+            "name": "search-file",
+            "title": "Search Everything",
+            "description": "Search files using Everything",
+            "mode": "view"
+        }
+    ],
+    "preferences": [
+        {
+            "name": "esExePath",
+            "title": "Everything CLI Path (es.exe)",
+            "description": "Custom path to es.exe. Leave empty to use system PATH.",
+            "type": "textfield",
+            "required": false,
+            "default": "",
+            "placeholder": "C:\\Program Files\\Everything\\es.exe"
+        },
+        {
+            "name": "fileExplorerCommand",
+            "title": "Custom File Explorer Command",
+            "description": "Custom command to open directories. Use %s as a placeholder for the path.",
+            "type": "textfield",
+            "required": false,
+            "default": "",
+            "placeholder": "\"C:\\Program Files\\Explorer\\App.exe\" -arg %s"
+        },
+        {
+            "name": "useCustomExplorerAsDefault",
+            "title": "Use Custom Explorer as Default Action",
+            "description": "If enabled, the primary action will be to open the file's location in your custom explorer.",
+            "type": "checkbox",
+            "required": false,
+            "default": false
+        }
+    ],
+    "dependencies": {
+        "@raycast/api": "^1.40.0",
+        "@raycast/utils": "^1.4.8"
     },
-    {
-      "name": "useCustomExplorerAsDefault",
-      "title": "Use Custom Explorer as Default Action",
-      "description": "If enabled, the primary action will be to open the file's location in your custom explorer.",
-      "type": "checkbox",
-      "required": false,
-      "default": false
+    "devDependencies": {
+        "@raycast/eslint-config": "^1.0.6",
+        "@types/node": "18.18.4",
+        "@types/react": "19.0.10",
+        "eslint": "^8.51.0",
+        "prettier": "^3.0.3",
+        "typescript": "^5.2.2"
+    },
+    "scripts": {
+        "build": "ray build -e dist",
+        "dev": "ray develop",
+        "fix-lint": "ray lint --fix",
+        "lint": "ray lint",
+        "publish": "ray publish"
     }
-  ],
-  "dependencies": {
-    "@raycast/api": "^1.40.0",
-    "@raycast/utils": "^1.4.8"
-  },
-  "devDependencies": {
-    "@raycast/eslint-config": "^1.0.6",
-    "@types/node": "18.18.4",
-    "@types/react": "19.0.10",
-    "eslint": "^8.51.0",
-    "prettier": "^3.0.3",
-    "typescript": "^5.2.2"
-  },
-  "scripts": {
-    "build": "ray build -e dist",
-    "dev": "ray develop",
-    "fix-lint": "ray lint --fix",
-    "lint": "ray lint",
-    "publish": "ray publish"
-  }
 }

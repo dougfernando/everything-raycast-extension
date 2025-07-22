@@ -8,6 +8,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
 type ExtensionPreferences = {
+  /** Everything CLI Path (es.exe) - Custom path to es.exe. Leave empty to use system PATH. */
+  "esExePath": string,
   /** Custom File Explorer Command - Custom command to open directories. Use %s as a placeholder for the path. */
   "fileExplorerCommand": string,
   /** Use Custom Explorer as Default Action - If enabled, the primary action will be to open the file's location in your custom explorer. */
