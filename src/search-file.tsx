@@ -85,32 +85,32 @@ function formatBytes(bytes: number, decimals = 2) {
 
 function truncatePath(path: string, maxLength: number = 50): string {
     if (path.length <= maxLength) return path
-    
-    const pathSeparator = path.includes('\\') ? '\\' : '/'
+
+    const pathSeparator = path.includes("\\") ? "\\" : "/"
     const parts = path.split(pathSeparator)
-    
+
     if (parts.length <= 3) return path
-    
+
     // Always keep the first two parts (drive + first folder) and last part
     const first = parts[0]
     const second = parts[1]
     const last = parts[parts.length - 1]
-    const ellipsis = '...'
-    
+    const ellipsis = "..."
+
     // Build: first + separator + second + separator + ellipsis + separator + last
     const basicTruncated = `${first}${pathSeparator}${second}${pathSeparator}${ellipsis}${pathSeparator}${last}`
     if (basicTruncated.length <= maxLength) {
         return basicTruncated
     }
-    
+
     // If still too long, truncate the last part
     const fixedPart = `${first}${pathSeparator}${second}${pathSeparator}${ellipsis}${pathSeparator}`
     const availableSpace = maxLength - fixedPart.length
     if (availableSpace > 0) {
-        const truncatedLast = last.length > availableSpace ? last.substring(0, availableSpace - 3) + '...' : last
+        const truncatedLast = last.length > availableSpace ? last.substring(0, availableSpace - 3) + "..." : last
         return `${fixedPart}${truncatedLast}`
     }
-    
+
     // If extremely long, just show first two parts with ellipsis
     return `${first}${pathSeparator}${second}${pathSeparator}${ellipsis}`
 }
@@ -314,7 +314,9 @@ export default function Command() {
                     key={file.commandline}
                     id={file.commandline}
                     title={file.name}
-                    subtitle={isShowingDetail ? basename(dirname(file.commandline)) : truncatePath(dirname(file.commandline))}
+                    subtitle={
+                        isShowingDetail ? basename(dirname(file.commandline)) : truncatePath(dirname(file.commandline))
+                    }
                     icon={{ fileIcon: file.commandline }}
                     accessories={[
                         {
@@ -353,12 +355,30 @@ export default function Command() {
                                 )}
                             </ActionPanel.Section>
                             <ActionPanel.Section>
-                                <Action.CopyToClipboard title="Copy Full Path" content={file.commandline} />
+                                <Action.CopyToClipboard
+                                    title="Copy File Name"
+                                    content={file.name}
+                                    shortcut={{
+                                        macOS: { modifiers: ["cmd"], key: "c" },
+                                        windows: { modifiers: ["ctrl"], key: "c" },
+                                    }}
+                                />
+                                <Action.CopyToClipboard
+                                    title="Copy Full Path"
+                                    content={file.commandline}
+                                    shortcut={{
+                                        macOS: { modifiers: ["cmd", "shift"], key: "c" },
+                                        windows: { modifiers: ["ctrl", "shift"], key: "c" },
+                                    }}
+                                />
                                 <Action
                                     title="Toggle Details"
                                     icon={Icon.AppWindowSidebarLeft}
                                     onAction={() => setIsShowingDetail(!isShowingDetail)}
-                                    shortcut={{ modifiers: ["cmd"], key: "i" }}
+                                    shortcut={{
+                                        macOS: { modifiers: ["cmd"], key: "i" },
+                                        windows: { modifiers: ["ctrl"], key: "i" },
+                                    }}
                                 />
                             </ActionPanel.Section>
                         </ActionPanel>
