@@ -195,11 +195,15 @@ async function loadFilesList(searchText: string): Promise<FileInfo[]> {
     } catch (error) {
         console.log(error)
         const errorMessage = error instanceof Error ? error.message : String(error)
-        const hasStderr = error && typeof error === 'object' && 'stderr' in error
-        const stderr = hasStderr ? String((error as any).stderr) : ""
-        
+        const hasStderr = error && typeof error === "object" && "stderr" in error
+        const stderr = hasStderr ? String(error.stderr) : ""
+
         // Check if es.exe command is not recognized (Windows) or not found (Unix-like)
-        if (stderr.includes("not recognized") || stderr.includes("command not found") || errorMessage.includes("not recognized")) {
+        if (
+            stderr.includes("not recognized") ||
+            stderr.includes("command not found") ||
+            errorMessage.includes("not recognized")
+        ) {
             const { esExePath } = getPreferenceValues<Preferences>()
             await showToast({
                 style: Toast.Style.Failure,
@@ -228,6 +232,17 @@ async function openFileFound(fileInfo: FileInfo) {
             message: `Opened ${fileInfo.name}`,
         })
     } catch (error) {
+        // if the error is related to permissions, run as administrator
+        if (
+            error instanceof Error &&
+            (error.message.includes("The requested operation requires elevation.") ||
+                error.message.includes("请求的操作需要提升。")) &&
+            fileInfo.commandline.toLowerCase().endsWith(".exe")
+        ) {
+            await runAsAdministrator(fileInfo.commandline)
+            return
+        }
+
         console.log(error)
         await showToast({
             style: Toast.Style.Failure,
@@ -235,6 +250,11 @@ async function openFileFound(fileInfo: FileInfo) {
             message: `Failed to open ${fileInfo.name}`,
         })
     }
+}
+
+async function runAsAdministrator(path: string) {
+    const command = `powershell -Command "Start-Process -FilePath '${path.replace(/'/g, "'''")}' -Verb RunAs"`
+    execAsync(command)
 }
 
 async function showInExplorer(path: string) {
@@ -249,7 +269,7 @@ async function showInExplorer(path: string) {
                 throw new Error("File explorer command is invalid.")
             }
 
-            const executable = commandParts[0].replace(/"/g, "")
+            const executable = commandParts[0]!.replace(/"/g, "")
             const args = commandParts.slice(1).map(arg => arg.replace("%s", targetPath))
 
             await execFileAsync(executable, args)
@@ -350,6 +370,13 @@ export default function Command() {
                                             icon={Icon.Desktop}
                                             onAction={() => openFileFound(file)}
                                         />
+                                        {file.commandline.toLowerCase().endsWith(".exe") && (
+                                            <Action
+                                                title="Run as Administrator"
+                                                icon={Icon.Shield}
+                                                onAction={() => runAsAdministrator(file.commandline)}
+                                            />
+                                        )}
                                     </>
                                 ) : (
                                     <>
@@ -363,6 +390,13 @@ export default function Command() {
                                             icon={Icon.Finder}
                                             onAction={() => showInExplorer(file.commandline)}
                                         />
+                                        {file.commandline.toLowerCase().endsWith(".exe") && (
+                                            <Action
+                                                title="Run as Administrator"
+                                                icon={Icon.Shield}
+                                                onAction={() => runAsAdministrator(file.commandline)}
+                                            />
+                                        )}
                                     </>
                                 )}
                             </ActionPanel.Section>
