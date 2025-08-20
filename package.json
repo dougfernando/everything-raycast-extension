@@ -40,11 +40,12 @@
             "placeholder": "\"C:\\Program Files\\Explorer\\App.exe\" -arg %s"
         },
         {
-            "name": "useCustomExplorerAsDefault",
-            "title": "Use Custom Explorer as Default Action",
-            "description": "If enabled, the primary action will be to open the file's location in your custom explorer.",
+            "name": "openFolderAsDefault",
+            "title": "Open Folder as Default Action",
+            "description": "If enabled, the primary action will be to open the file's location instead of opening the file itself.",
             "type": "checkbox",
             "required": false,
+            "label": "Open folder instead of file",
             "default": false
         }
     ],

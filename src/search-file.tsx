@@ -138,7 +138,7 @@ interface FileInfo {
 interface Preferences {
     esExePath?: string
     fileExplorerCommand?: string
-    useCustomExplorerAsDefault?: boolean
+    openFolderAsDefault?: boolean
 }
 
 async function loadFilesList(searchText: string): Promise<FileInfo[]> {
@@ -295,7 +295,7 @@ export default function Command() {
     const { data: searchResults, isLoading } = useCachedPromise((text: string) => loadFilesList(text), [searchText], {
         initialData: [],
     })
-    const { useCustomExplorerAsDefault } = getPreferenceValues<Preferences>()
+    const { openFolderAsDefault } = getPreferenceValues<Preferences>()
 
     async function onSelectionChange(itemId: string | null) {
         setPreviewContent(null)
@@ -341,9 +341,9 @@ export default function Command() {
                 }
                 icon={Icon.MagnifyingGlass}
             />
-            {searchResults.map(file => (
+            {searchResults.map((file, index) => (
                 <List.Item
-                    key={file.commandline}
+                    key={`${file.commandline}-${index}`}
                     id={file.commandline}
                     title={file.name}
                     subtitle={
@@ -358,7 +358,7 @@ export default function Command() {
                     actions={
                         <ActionPanel>
                             <ActionPanel.Section>
-                                {useCustomExplorerAsDefault ? (
+                                {openFolderAsDefault ? (
                                     <>
                                         <Action
                                             title="Show in Explorer"
