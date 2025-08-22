@@ -47,6 +47,14 @@
             "required": false,
             "label": "Open folder instead of file",
             "default": false
+        },
+        {
+            "name": "minCharsToSearch",
+            "title": "Minimum Characters to Trigger Search",
+            "description": "Number of characters required before a search is performed.",
+            "type": "textfield",
+            "required": false,
+            "default": "3"
         }
     ],
     "dependencies": {

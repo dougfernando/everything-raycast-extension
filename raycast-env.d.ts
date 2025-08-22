@@ -12,8 +12,10 @@ type ExtensionPreferences = {
   "esExePath": string,
   /** Custom File Explorer Command - Custom command to open directories. Use %s as a placeholder for the path. */
   "fileExplorerCommand": string,
-  /** Use Custom Explorer as Default Action - If enabled, the primary action will be to open the file's location in your custom explorer. */
-  "useCustomExplorerAsDefault": boolean
+  /** Open Folder as Default Action - If enabled, the primary action will be to open the file's location instead of opening the file itself. */
+  "openFolderAsDefault": boolean,
+  /** Minimum Characters to Trigger Search - Number of characters required before a search is performed. */
+  "minCharsToSearch": string
 }
 
 /** Preferences accessible in all the extension's commands */

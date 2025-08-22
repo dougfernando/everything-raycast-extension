@@ -4,7 +4,7 @@ import { exec, execFile } from "child_process"
 import { readFile } from "fs/promises"
 import { promisify } from "util"
 import { basename, dirname, extname } from "path"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 const execAsync = promisify(exec)
 const execFileAsync = promisify(execFile)
@@ -139,15 +139,17 @@ interface Preferences {
     esExePath?: string
     fileExplorerCommand?: string
     openFolderAsDefault?: boolean
+    minCharsToSearch?: string
 }
 
-async function loadFilesList(searchText: string): Promise<FileInfo[]> {
+async function loadFilesList(searchText: string, preferences: Preferences): Promise<FileInfo[]> {
     if (!searchText) {
         return []
     }
 
+    const { esExePath } = preferences
+
     try {
-        const { esExePath } = getPreferenceValues<Preferences>()
         const esCommand = esExePath || "es.exe"
 
         // Use es.exe with CSV output format to get file info in one call
@@ -163,7 +165,7 @@ async function loadFilesList(searchText: string): Promise<FileInfo[]> {
         // Skip header line and parse CSV data
         const dataLines = lines.slice(1)
 
-        return dataLines.map(line => {
+        const results = dataLines.map(line => {
             // Parse CSV line (handle quoted values that may contain commas)
             const csvRegex = /(?:^|,)(?:"([^"]*)"|([^,]*))/g
             const values: string[] = []
@@ -192,6 +194,7 @@ async function loadFilesList(searchText: string): Promise<FileInfo[]> {
                 dateModified: parseEsDate(dateModifiedStr),
             }
         })
+        return results
     } catch (error) {
         console.log(error)
         const errorMessage = error instanceof Error ? error.message : String(error)
@@ -204,7 +207,6 @@ async function loadFilesList(searchText: string): Promise<FileInfo[]> {
             stderr.includes("command not found") ||
             errorMessage.includes("not recognized")
         ) {
-            const { esExePath } = getPreferenceValues<Preferences>()
             await showToast({
                 style: Toast.Style.Failure,
                 title: esExePath ? "Custom es.exe path not found" : "'es.exe' not found",
@@ -257,8 +259,8 @@ async function runAsAdministrator(path: string) {
     execAsync(command)
 }
 
-async function showInExplorer(path: string) {
-    const { fileExplorerCommand } = getPreferenceValues<Preferences>()
+async function showInExplorer(path: string, preferences: Preferences) {
+    const { fileExplorerCommand } = preferences
     // For files, show the containing directory; for directories, show the directory itself
     const targetPath = dirname(path)
 
@@ -291,11 +293,31 @@ export default function Command() {
     const [isShowingDetail, setIsShowingDetail] = useState(false)
     const [selectedFile, setSelectedFile] = useState<FileInfo | null>(null)
     const [previewContent, setPreviewContent] = useState<string | null>(null)
+    const [preferences, setPreferences] = useState<Preferences | null>(null)
 
-    const { data: searchResults, isLoading } = useCachedPromise((text: string) => loadFilesList(text), [searchText], {
-        initialData: [],
-    })
-    const { openFolderAsDefault } = getPreferenceValues<Preferences>()
+    useEffect(() => {
+        const loadPrefs = () => {
+            const prefs = getPreferenceValues<Preferences>()
+            setPreferences(prefs)
+        }
+        loadPrefs()
+    }, [])
+
+    const minChars = parseInt(preferences?.minCharsToSearch || "3", 10)
+    const openFolderAsDefault = preferences?.openFolderAsDefault
+
+    const { data: searchResults, isLoading } = useCachedPromise(
+        (text: string) => {
+            if (!preferences || text.length < minChars) {
+                return Promise.resolve([])
+            }
+            return loadFilesList(text, preferences)
+        },
+        [searchText, preferences],
+        {
+            initialData: [],
+        },
+    )
 
     async function onSelectionChange(itemId: string | null) {
         setPreviewContent(null)
@@ -333,11 +355,19 @@ export default function Command() {
             throttle
         >
             <List.EmptyView
-                title={searchText ? "No Files Found" : "Search for Anything"}
+                title={
+                    searchText.length > 0 && searchText.length < minChars
+                        ? "Keep typing..."
+                        : searchText
+                          ? "No Files Found"
+                          : "Search for Anything"
+                }
                 description={
-                    searchText
-                        ? `No results for "${searchText}"`
-                        : "Start typing to search your entire system with Everything."
+                    searchText.length > 0 && searchText.length < minChars
+                        ? `The search will start after you type at least ${minChars} characters.`
+                        : searchText
+                          ? `No results for "${searchText}"`
+                          : "Start typing to search your entire system with Everything."
                 }
                 icon={Icon.MagnifyingGlass}
             />
@@ -363,7 +393,7 @@ export default function Command() {
                                         <Action
                                             title="Show in Explorer"
                                             icon={Icon.Finder}
-                                            onAction={() => showInExplorer(file.commandline)}
+                                            onAction={() => preferences && showInExplorer(file.commandline, preferences)}
                                         />
                                         <Action
                                             title="Open File"
@@ -388,7 +418,7 @@ export default function Command() {
                                         <Action
                                             title="Show in Explorer"
                                             icon={Icon.Finder}
-                                            onAction={() => showInExplorer(file.commandline)}
+                                            onAction={() => preferences && showInExplorer(file.commandline, preferences)}
                                         />
                                         {file.commandline.toLowerCase().endsWith(".exe") && (
                                             <Action
