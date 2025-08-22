@@ -335,11 +335,11 @@ export default function Command() {
     const openFolderAsDefault = preferences?.openFolderAsDefault;
 
     const { data: searchResults, isLoading } = useCachedPromise(
-        (text: string) => {
-            if (!preferences || text.length < minChars) {
+        (text: string, prefs: Preferences | null) => {
+            if (!prefs || text.length < minChars) {
                 return Promise.resolve([]);
             }
-            return loadFilesList(text, preferences);
+            return loadFilesList(text, prefs);
         },
         [searchText, preferences],
         {
