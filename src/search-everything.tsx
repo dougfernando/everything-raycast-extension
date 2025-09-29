@@ -7,7 +7,8 @@ import {
     open,
     showToast,
     Toast,
-    Clipboard, // Import Clipboard from the API
+    Clipboard,
+    useNavigation,
 } from "@raycast/api"
 import { useCachedPromise } from "@raycast/utils"
 import { exec, execFile } from "child_process"
@@ -149,6 +150,7 @@ interface FileInfo {
 interface Preferences {
     esExePath?: string
     fileExplorerCommand?: string
+    defaultSort: string
     openFolderAsDefault?: boolean
     minCharsToSearch?: string
 }
@@ -158,13 +160,13 @@ async function loadFilesList(searchText: string, preferences: Preferences): Prom
         return []
     }
 
-    const { esExePath } = preferences
+    const { esExePath, defaultSort } = preferences
 
     try {
         const esCommand = esExePath || "es.exe"
 
         // Use es.exe with CSV output format to get file info in one call
-        const command = `chcp 65001 > nul && "${esCommand}" -n 100 -csv -name -filename-column -size -date-created -date-modified ${searchText}`
+        const command = `chcp 65001 > nul && "${esCommand}" -n 100 -csv -name -filename-column -size -date-created -date-modified ${defaultSort} ${searchText}`
 
         const { stdout } = await execAsync(command)
 
@@ -383,6 +385,7 @@ function DirectoryBrowser({ directoryPath, preferences }: { directoryPath: strin
     const [selectedFile, setSelectedFile] = useState<FileInfo | null>(null)
     const [previewContent, setPreviewContent] = useState<string | null>(null)
     const openFolderAsDefault = preferences?.openFolderAsDefault
+    const { pop } = useNavigation()
 
     const { data: directoryContents, isLoading } = useCachedPromise(
         async (path: string) => {
@@ -447,29 +450,17 @@ function DirectoryBrowser({ directoryPath, preferences }: { directoryPath: strin
                     actions={
                         <ActionPanel>
                             <ActionPanel.Section>
-                                {item.isDirectory ? (
-                                    <Action.Push
-                                        title="Browse Directory"
-                                        icon={Icon.Folder}
-                                        target={
-                                            <DirectoryBrowser
-                                                directoryPath={item.commandline}
-                                                preferences={preferences}
-                                            />
-                                        }
-                                    />
-                                ) : null}
                                 {openFolderAsDefault ? (
                                     <>
                                         <Action
                                             title="Show in Explorer"
-                                            icon={Icon.Finder}
+                                            icon={Icon.Folder}
                                             onAction={() => showInExplorer(item.commandline, preferences)}
                                         />
                                         {!item.isDirectory && (
                                             <Action
-                                                title="Open File"
-                                                icon={Icon.Desktop}
+                                                title="Open"
+                                                icon={Icon.Document}
                                                 onAction={() => openFileFound(item)}
                                             />
                                         )}
@@ -485,14 +476,14 @@ function DirectoryBrowser({ directoryPath, preferences }: { directoryPath: strin
                                     <>
                                         {!item.isDirectory && (
                                             <Action
-                                                title="Open File"
-                                                icon={Icon.Desktop}
+                                                title="Open"
+                                                icon={Icon.Document}
                                                 onAction={() => openFileFound(item)}
                                             />
                                         )}
                                         <Action
                                             title="Show in Explorer"
-                                            icon={Icon.Finder}
+                                            icon={Icon.Folder}
                                             onAction={() => showInExplorer(item.commandline, preferences)}
                                         />
                                         {item.commandline.toLowerCase().endsWith(".exe") && (
@@ -504,16 +495,25 @@ function DirectoryBrowser({ directoryPath, preferences }: { directoryPath: strin
                                         )}
                                     </>
                                 )}
+                                <Action
+                                    title="Toggle Details"
+                                    icon={Icon.AppWindowSidebarLeft}
+                                    onAction={() => setIsShowingDetail(!isShowingDetail)}
+                                    shortcut={{
+                                        macOS: { modifiers: ["cmd", "shift"], key: "i" },
+                                        windows: { modifiers: ["ctrl", "shift"], key: "i" },
+                                    }}
+                                />
                             </ActionPanel.Section>
                             <ActionPanel.Section>
                                 <Action
-                                    title="Copy File/directory"
+                                    title="Copy File"
                                     icon={Icon.Clipboard}
                                     onAction={() => copyFileWithApi(item)}
                                     shortcut={{ modifiers: ["ctrl", "shift"], key: "." }}
                                 />
                                 <Action.CopyToClipboard
-                                    title="Copy File Name"
+                                    title="Copy Name"
                                     content={item.name}
                                     shortcut={{
                                         macOS: { modifiers: ["cmd"], key: "c" },
@@ -521,22 +521,61 @@ function DirectoryBrowser({ directoryPath, preferences }: { directoryPath: strin
                                     }}
                                 />
                                 <Action.CopyToClipboard
-                                    title="Copy Full Path"
+                                    title="Copy Path"
                                     content={item.commandline}
                                     shortcut={{
                                         macOS: { modifiers: ["cmd", "shift"], key: "c" },
                                         windows: { modifiers: ["ctrl", "shift"], key: "c" },
                                     }}
                                 />
-                                <Action
-                                    title="Toggle Details"
-                                    icon={Icon.AppWindowSidebarLeft}
-                                    onAction={() => setIsShowingDetail(!isShowingDetail)}
-                                    shortcut={{
-                                        macOS: { modifiers: ["cmd"], key: "i" },
-                                        windows: { modifiers: ["ctrl"], key: "i" },
-                                    }}
-                                />
+                            </ActionPanel.Section>
+                            <ActionPanel.Section>
+                                {item.isDirectory ? (
+                                    <>
+                                        {dirname(directoryPath) !== directoryPath && (
+                                            <Action.Push
+                                                title="Navigate Up"
+                                                icon={Icon.ArrowUp}
+                                                target={
+                                                    <DirectoryBrowser
+                                                        directoryPath={dirname(directoryPath)}
+                                                        preferences={preferences}
+                                                    />
+                                                }
+                                                shortcut={{
+                                                    macOS: { modifiers: ["cmd", "shift"], key: "arrowUp" },
+                                                    windows: { modifiers: ["ctrl", "shift"], key: "arrowUp" },
+                                                }}
+                                            />
+                                        )}
+                                        <Action.Push
+                                            title="Navigate Down"
+                                            icon={Icon.ArrowDown}
+                                            target={
+                                                <DirectoryBrowser
+                                                    directoryPath={item.commandline}
+                                                    preferences={preferences}
+                                                />
+                                            }
+                                            shortcut={{
+                                                macOS: { modifiers: ["cmd", "shift"], key: "arrowDown" },
+                                                windows: { modifiers: ["ctrl", "shift"], key: "arrowDown" },
+                                            }}
+                                        />
+                                    </>
+                                ) : (
+                                    dirname(directoryPath) !== directoryPath && (
+                                        <Action
+                                            title="Navigate Up"
+                                            icon={Icon.ArrowUp}
+                                            onAction={() => pop()}
+                                            shortcut={{
+                                                macOS: { modifiers: ["cmd", "shift"], key: "arrowUp" },
+                                                windows: { modifiers: ["ctrl", "shift"], key: "arrowUp" },
+                                            }}
+                                        />
+                                    )
+                                )}
                             </ActionPanel.Section>
                         </ActionPanel>
                     }
@@ -683,31 +722,25 @@ export default function Command() {
                     actions={
                         <ActionPanel>
                             <ActionPanel.Section>
-                                {file.isDirectory && preferences ? (
-                                    <Action.Push
-                                        title="Browse Directory"
-                                        icon={Icon.Folder}
-                                        target={
-                                            <DirectoryBrowser
-                                                directoryPath={file.commandline}
-                                                preferences={preferences}
-                                            />
-                                        }
-                                    />
-                                ) : null}
                                 {openFolderAsDefault ? (
                                     <>
                                         <Action
                                             title="Show in Explorer"
-                                            icon={Icon.Finder}
+                                            icon={Icon.Folder}
                                             onAction={() =>
                                                 preferences && showInExplorer(file.commandline, preferences)
                                             }
                                         />
-                                        {!file.isDirectory && (
+                                        {file.isDirectory ? (
                                             <Action
-                                                title="Open File"
-                                                icon={Icon.Desktop}
+                                                title="Open"
+                                                icon={Icon.Document}
+                                                onAction={() => open(file.commandline)}
+                                            />
+                                        ) : (
+                                            <Action
+                                                title="Open"
+                                                icon={Icon.Document}
                                                 onAction={() => openFileFound(file)}
                                             />
                                         )}
@@ -721,16 +754,22 @@ export default function Command() {
                                     </>
                                 ) : (
                                     <>
-                                        {!file.isDirectory && (
+                                        {file.isDirectory ? (
                                             <Action
-                                                title="Open File"
-                                                icon={Icon.Desktop}
+                                                title="Open"
+                                                icon={Icon.Document}
+                                                onAction={() => open(file.commandline)}
+                                            />
+                                        ) : (
+                                            <Action
+                                                title="Open"
+                                                icon={Icon.Document}
                                                 onAction={() => openFileFound(file)}
                                             />
                                         )}
                                         <Action
                                             title="Show in Explorer"
-                                            icon={Icon.Finder}
+                                            icon={Icon.Folder}
                                             onAction={() =>
                                                 preferences && showInExplorer(file.commandline, preferences)
                                             }
@@ -744,16 +783,25 @@ export default function Command() {
                                         )}
                                     </>
                                 )}
+                                <Action
+                                    title="Toggle Details"
+                                    icon={Icon.AppWindowSidebarLeft}
+                                    onAction={() => setIsShowingDetail(!isShowingDetail)}
+                                    shortcut={{
+                                        macOS: { modifiers: ["cmd", "shift"], key: "i" },
+                                        windows: { modifiers: ["ctrl", "shift"], key: "i" },
+                                    }}
+                                />
                             </ActionPanel.Section>
                             <ActionPanel.Section>
                                 <Action
-                                    title="Copy File/directory"
+                                    title="Copy File"
                                     icon={Icon.Clipboard}
                                     onAction={() => copyFileWithApi(file)}
                                     shortcut={{ modifiers: ["ctrl", "shift"], key: "." }}
                                 />
                                 <Action.CopyToClipboard
-                                    title="Copy File Name"
+                                    title="Copy Name"
                                     content={file.name}
                                     shortcut={{
                                         macOS: { modifiers: ["cmd"], key: "c" },
@@ -761,22 +809,49 @@ export default function Command() {
                                     }}
                                 />
                                 <Action.CopyToClipboard
-                                    title="Copy Full Path"
+                                    title="Copy Path"
                                     content={file.commandline}
                                     shortcut={{
                                         macOS: { modifiers: ["cmd", "shift"], key: "c" },
                                         windows: { modifiers: ["ctrl", "shift"], key: "c" },
                                     }}
                                 />
-                                <Action
-                                    title="Toggle Details"
-                                    icon={Icon.AppWindowSidebarLeft}
-                                    onAction={() => setIsShowingDetail(!isShowingDetail)}
-                                    shortcut={{
-                                        macOS: { modifiers: ["cmd"], key: "i" },
-                                        windows: { modifiers: ["ctrl"], key: "i" },
-                                    }}
-                                />
+                            </ActionPanel.Section>
+                            <ActionPanel.Section>
+                                {file.isDirectory && preferences ? (
+                                    <>
+                                        {dirname(file.commandline) !== file.commandline && (
+                                            <Action.Push
+                                                title="Navigate Up"
+                                                icon={Icon.ArrowUp}
+                                                target={
+                                                    <DirectoryBrowser
+                                                        directoryPath={dirname(file.commandline)}
+                                                        preferences={preferences}
+                                                    />
+                                                }
+                                                shortcut={{
+                                                    macOS: { modifiers: ["cmd", "shift"], key: "arrowUp" },
+                                                    windows: { modifiers: ["ctrl", "shift"], key: "arrowUp" },
+                                                }}
+                                            />
+                                        )}
+                                        <Action.Push
+                                            title="Navigate Down"
+                                            icon={Icon.ArrowDown}
+                                            target={
+                                                <DirectoryBrowser
+                                                    directoryPath={file.commandline}
+                                                    preferences={preferences}
+                                                />
+                                            }
+                                            shortcut={{
+                                                macOS: { modifiers: ["cmd", "shift"], key: "arrowDown" },
+                                                windows: { modifiers: ["ctrl", "shift"], key: "arrowDown" },
+                                            }}
+                                        />
+                                    </>
+                                ) : null}
                             </ActionPanel.Section>
                         </ActionPanel>
                     }
