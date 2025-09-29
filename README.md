@@ -81,18 +81,19 @@ Access the extension preferences in Raycast to customize:
 - **Everything CLI Path**: Custom path to es.exe (leave empty to use system PATH)
 - **File Explorer Command**: Custom file manager command (use `%s` as path placeholder)
 - **Default Action**: Choose between opening files or folders as primary action
+- **Default Sort**: Choose default sorting method for search results
 - **Search Threshold**: Minimum characters required before search starts (default: 3)
 
 ## 💡 Usage Tips
 
 - **Quick Search**: Start typing immediately - no need to wait for interface loading
 - **Directory Navigation**: Use the "Browse Directory" action on folders to explore contents
-- **File Preview**: Toggle detail view (`Ctrl+I`) to preview text files
+- **File Preview**: Toggle detail view (`Ctrl+Shift+I`) to preview text files
 - **Keyboard Shortcuts**: 
   - `Ctrl+C` / `Cmd+C`: Copy file name
   - `Ctrl+Shift+C` / `Cmd+Shift+C`: Copy full path
   - `Ctrl+Shift+.`: Copy file to clipboard
-  - `Ctrl+I` / `Cmd+I`: Toggle details
+  - `Ctrl+Shift+I` / `Cmd+Shift+I`: Toggle details
 
 ## 🔧 Development
 
