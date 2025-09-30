@@ -1,6 +1,6 @@
 # Changelog
 
-## [Initial] - 2025-09-30
+## [Initial] - {PR_MERGE_DATE}
 
 ### Added
 - File search functionality using Everything CLI integration

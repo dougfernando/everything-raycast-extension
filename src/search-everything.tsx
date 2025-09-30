@@ -157,10 +157,22 @@ async function loadFilesList(searchText: string, preferences: Preferences): Prom
   try {
     const esCommand = esExePath || "es.exe";
 
-    // Use es.exe with CSV output format to get file info in one call
-    const command = `chcp 65001 > nul && "${esCommand}" -n 100 -csv -name -filename-column -size -date-created -date-modified ${defaultSort} ${searchText}`;
+    // Use a secure approach that handles spaces correctly
+    // Everything CLI works best with individual search terms (not quoted phrases)
+    // This allows "acn 2019" to find "acn doc 2019"
 
-    const { stdout } = await execAsync(command);
+    // Sanitize each search term individually to prevent injection
+    const searchTerms = searchText.split(/\s+/).filter((term) => term.trim());
+    const sanitizedTerms = searchTerms.map((term) => term.replace(/[&|;$`\\"`'<>]/g, (match) => `\\${match}`));
+
+    // Build command with individual search terms (Everything will AND them together)
+    const baseCommand = `chcp 65001 > nul && "${esCommand}" -n 100 -csv -name -filename-column -size -date-created -date-modified`;
+    const sortCommand = defaultSort ? ` ${defaultSort}` : "";
+    const searchCommand = sanitizedTerms.length > 0 ? ` ${sanitizedTerms.join(" ")}` : "";
+
+    const fullCommand = baseCommand + sortCommand + searchCommand;
+
+    const { stdout } = await execAsync(fullCommand);
 
     const lines = stdout
       .trim()

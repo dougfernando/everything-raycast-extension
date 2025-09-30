@@ -64,27 +64,8 @@ A powerful Raycast extension that integrates with Everything CLI to provide ligh
    - Or install via: `winget install voidtools.Everything`
 
 ### Extension Installation
-#### Option 1: Install from Raycast Store (Recommended)
-> **Coming Soon**: This extension will be available in the Raycast store once published.
 
-#### Option 2: Manual Installation
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/dougfernando/everything-raycast-extension.git
-   cd everything-raycast-extension
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm ci
-   ```
-
-3. **Add to Raycast**:
-   ```bash
-   npm run dev
-   ```
-
-The extension will be automatically added to your Raycast installation and ready to use!
+This extension is available through the Raycast store. Search for "Everything" in the Raycast store to install it.
 
 ## 🛠️ Configuration
 
