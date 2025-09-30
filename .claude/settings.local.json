@@ -12,7 +12,8 @@
       "Bash(node:*)",
       "Bash(npm run fix-lint)",
       "WebFetch(domain:developers.raycast.com)",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "Bash(npx prettier:*)"
     ],
     "deny": [],
     "ask": []

@@ -294,7 +294,16 @@ async function openFileFound(fileInfo: FileInfo) {
 
 async function runAsAdministrator(path: string) {
   const command = `powershell -Command "Start-Process -FilePath '${path.replace(/'/g, "''")}' -Verb RunAs"`;
-  execAsync(command);
+  try {
+    await execAsync(command);
+  } catch (error) {
+    console.log(error);
+    await showToast({
+      style: Toast.Style.Failure,
+      title: "Error Running as Administrator",
+      message: error instanceof Error ? error.message : "Failed to run as administrator",
+    });
+  }
 }
 
 async function showInExplorer(path: string, preferences: Preferences) {
@@ -530,7 +539,7 @@ function DirectoryBrowser({ directoryPath, preferences }: { directoryPath: strin
                   <>
                     {dirname(directoryPath) !== directoryPath && (
                       <Action.Push
-                        title="Navigate Up"
+                        title="Navigate up"
                         icon={Icon.ArrowUp}
                         target={<DirectoryBrowser directoryPath={dirname(directoryPath)} preferences={preferences} />}
                         shortcut={{
@@ -552,7 +561,7 @@ function DirectoryBrowser({ directoryPath, preferences }: { directoryPath: strin
                 ) : (
                   dirname(directoryPath) !== directoryPath && (
                     <Action
-                      title="Navigate Up"
+                      title="Navigate up"
                       icon={Icon.ArrowUp}
                       onAction={() => pop()}
                       shortcut={{
@@ -783,7 +792,7 @@ export default function Command() {
                   <>
                     {dirname(file.commandline) !== file.commandline && (
                       <Action.Push
-                        title="Navigate Up"
+                        title="Navigate up"
                         icon={Icon.ArrowUp}
                         target={
                           <DirectoryBrowser directoryPath={dirname(file.commandline)} preferences={preferences} />
