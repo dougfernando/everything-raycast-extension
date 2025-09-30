@@ -18,7 +18,7 @@ This is a Raycast extension for Windows that integrates with Everything CLI (`es
 
 ### Core Components
 
-- **Main Search Component** (`src/search-file.tsx`): The primary React component that handles file searching, preview, and actions
+- **Main Search Component** (`src/search-everything.tsx`): The primary React component that handles file searching, preview, and actions
 - **Everything CLI Integration**: Uses Windows `es.exe` command-line tool for file indexing and search
 - **File Preview System**: Intelligent text file detection and preview for supported file types
 
