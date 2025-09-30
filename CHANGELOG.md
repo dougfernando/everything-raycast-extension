@@ -1,5 +1,9 @@
 # Everything Search Changelog
 
+## [Published to Raycast Store] - {PR_MERGE_DATE}
+
+- Added missing elements for Raycast Store submission
+
 ## [Raycast Integration Improvements] - 2025-09-29
 
 - Restructure project to follow official Raycast guidelines
