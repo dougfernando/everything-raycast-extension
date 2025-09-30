@@ -1,10 +1,10 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "everything-ext",
-  "title": "Everything",
-  "description": "Fast file search powered by Everything CLI - search your entire Windows system instantly",
+  "title": "Everything Search",
+  "description": "Search files using Everything-CLI on Windows.",
   "icon": "extension-icon.png",
-  "author": "doug_fernando",
+  "author": "dfs",
   "contributors": [
     "laurynas_gailius"
   ],
@@ -12,10 +12,9 @@
   "commands": [
     {
       "name": "search-everything",
-      "title": "Search Using Everything",
+      "title": "Search Files",
       "description": "Search files using Everything",
-      "mode": "view",
-      "subtitle": "Everything"
+      "mode": "view"
     }
   ],
   "preferences": [
@@ -51,8 +50,8 @@
       "title": "Default Sorting",
       "description": "Choose default sorting applied to all query results.",
       "type": "dropdown",
-      "required": true,
-      "default": "-sort name-ascending",
+      "required": false,
+      "default": "-sort name -sort-ascending",
       "data": [
         {
           "title": "Name (A-Z)",
@@ -166,15 +165,12 @@
     "@raycast/utils": "^2.2.1"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.36.0",
     "@raycast/eslint-config": "^2.0.4",
-    "@types/node": "22.13.10",
-    "@types/react": "19.0.10",
+    "@types/node": "24.6.0",
+    "@types/react": "19.1.16",
     "eslint": "^9.36.0",
-    "globals": "^16.4.0",
-    "prettier": "^3.5.3",
-    "typescript": "^5.8.2"
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2"
   },
   "scripts": {
     "dev": "ray develop",
@@ -188,7 +184,9 @@
     "Windows"
   ],
   "categories": [
+    "Applications",
     "Productivity",
+    "System",
     "Developer Tools"
   ]
 }

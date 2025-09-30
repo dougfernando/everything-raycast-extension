@@ -16,7 +16,9 @@
       "Bash(npx prettier:*)",
       "Bash(gh pr checkout:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh pr view:*)"
     ],
     "deny": [],
     "ask": []
