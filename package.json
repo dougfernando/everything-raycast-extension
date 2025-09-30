@@ -4,7 +4,7 @@
   "title": "Everything Search",
   "description": "Search files using Everything-CLI on Windows.",
   "icon": "extension-icon.png",
-  "author": "dfs",
+  "author": "doug_fernando",
   "contributors": [
     "laurynas_gailius"
   ],
