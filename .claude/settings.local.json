@@ -13,7 +13,10 @@
       "Bash(npm run fix-lint)",
       "WebFetch(domain:developers.raycast.com)",
       "Bash(npm view:*)",
-      "Bash(npx prettier:*)"
+      "Bash(npx prettier:*)",
+      "Bash(gh pr checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
