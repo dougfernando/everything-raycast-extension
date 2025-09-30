@@ -306,7 +306,7 @@ async function showInExplorer(path: string, preferences: Preferences) {
             }
 
             const executable = commandParts[0]!.replace(/"/g, "")
-            const args = commandParts.slice(1).map(arg => arg.replace("%s", targetPath))
+            const args = commandParts.slice(1).map((arg: string) => arg.replace("%s", targetPath))
 
             await execFileAsync(executable, args)
         } catch (error) {
