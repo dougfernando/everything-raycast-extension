@@ -10,7 +10,9 @@
       "Bash(npm run lint)",
       "Bash(npx eslint:*)",
       "Bash(node:*)",
-      "Bash(npm run fix-lint)"
+      "Bash(npm run fix-lint)",
+      "WebFetch(domain:developers.raycast.com)",
+      "Bash(npm view:*)"
     ],
     "deny": [],
     "ask": []

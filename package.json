@@ -2,9 +2,9 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "everything-ext",
   "title": "Everything",
-  "description": "Search files using everything",
+  "description": "Fast file search powered by Everything CLI - search your entire Windows system instantly",
   "icon": "extension-icon.png",
-  "author": "dfs",
+  "author": "doug_fernando",
   "contributors": [
     "laurynas_gailius"
   ],
@@ -12,7 +12,7 @@
   "commands": [
     {
       "name": "search-everything",
-      "title": "Search Everything",
+      "title": "Search Using Everything",
       "description": "Search files using Everything",
       "mode": "view",
       "subtitle": "Everything"
@@ -52,7 +52,7 @@
       "description": "Choose default sorting applied to all query results.",
       "type": "dropdown",
       "required": true,
-      "default": "-sort name -sort-ascending",
+      "default": "-sort name-ascending",
       "data": [
         {
           "title": "Name (A-Z)",
