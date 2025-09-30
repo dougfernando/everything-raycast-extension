@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(git restore:*)",
+      "Bash(npm run publish:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm info:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run lint)",
+      "Bash(npx eslint:*)",
+      "Bash(node:*)",
+      "Bash(npm run fix-lint)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
