@@ -1,6 +1,6 @@
 # Everything Extension for Raycast (Windows)
 
-![Demo GIF](./assets/demo.gif)
+![Demo GIF](./media/demo.gif)
 
 *Quick demo showing the extension in action*
 
@@ -9,8 +9,6 @@
 *Store-ready screenshot showing the main search interface*
 
 A powerful Raycast extension that integrates with Everything CLI to provide lightning-fast file system search and navigation on Windows. Transform your file discovery workflow with instant search results and comprehensive directory browsing capabilities.
-
-> **Store Status**: ✅ Fully compliant with Raycast store guidelines and ready for submission.
 
 > **Attribution**: Initially inspired by the [PuttTim/windows-terminal](https://github.com/PuttTim/windows-terminal) project structure & setup.
 
