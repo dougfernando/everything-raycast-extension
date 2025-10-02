@@ -24,7 +24,7 @@ export function FileDetailMetadata({ file }: FileDetailMetadataProps) {
         } else {
           setPreviewContent(null);
         }
-      } catch (error) {
+      } catch {
         setPreviewContent(null);
       }
     }

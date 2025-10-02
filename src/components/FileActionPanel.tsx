@@ -1,38 +1,20 @@
-import { Action, ActionPanel, Icon, open, useNavigation } from "@raycast/api";
+import { Action, ActionPanel, Icon, open } from "@raycast/api";
 import { FileInfo, Preferences } from "../types";
 import { openFileFound, runAsAdministrator, showInExplorer, copyFileWithApi } from "../services/fileOperations";
 import { isExecutableFile } from "../utils/file";
-import { useEffect, useState } from "react";
-import { useDirectoryStack } from "../hooks/useDirectoryStack";
-import { DirectoryBrowser } from "./DirectoryBrowser";
-import { dirname } from "path";
 
 interface FileActionPanelProps {
   file: FileInfo | null;
-  directory?: string;
   preferences: Preferences;
-  isShowingDetail: boolean;
   onToggleDetails: () => void;
-  directoryStack: ReturnType<typeof useDirectoryStack>;
   children?: React.ReactNode;
 }
 
-export function FileActionPanel({
-  file,
-  directory,
-  preferences,
-  isShowingDetail,
-  onToggleDetails,
-  directoryStack,
-  children,
-}: FileActionPanelProps) {
+export function FileActionPanel({ file, preferences, onToggleDetails, children }: FileActionPanelProps) {
   if (!file) return null;
 
-  const { pop: navigateBack } = useNavigation();
   const openFolderAsDefault = preferences?.openFolderAsDefault;
   const isExecutable = isExecutableFile(file.commandline);
-  const directoryToCheck = directory || file.commandline;
-  const isBaseDirectory = dirname(directoryToCheck) === directoryToCheck;
 
   return (
     <ActionPanel>
@@ -106,68 +88,7 @@ export function FileActionPanel({
           }}
         />
       </ActionPanel.Section>
-      <ActionPanel.Section>
-        {!isBaseDirectory &&
-          (directoryStack.peek() === dirname(file.commandline) ? (
-            <Action
-              title="Navigate Up"
-              icon={Icon.ArrowUp}
-              onAction={() => navigateBack()}
-              shortcut={{
-                macOS: { modifiers: ["cmd", "shift"], key: "arrowUp" },
-                windows: { modifiers: ["ctrl", "shift"], key: "arrowUp" },
-              }}
-            />
-          ) : (
-            <Action.Push
-              title="Navigate Up"
-              icon={Icon.ArrowUp}
-              target={
-                <DirectoryBrowser
-                  directoryPath={dirname(file.commandline)}
-                  preferences={preferences}
-                  isShowingDetail={isShowingDetail}
-                  onToggleDetails={onToggleDetails}
-                  directoryStack={directoryStack}
-                />
-              }
-              shortcut={{
-                macOS: { modifiers: ["cmd", "shift"], key: "arrowUp" },
-                windows: { modifiers: ["ctrl", "shift"], key: "arrowUp" },
-              }}
-            />
-          ))}
-        {file?.isDirectory &&
-          (directoryStack.peek() === file.commandline ? (
-            <Action
-              title="Navigate Down"
-              icon={Icon.ArrowDown}
-              onAction={() => navigateBack()}
-              shortcut={{
-                macOS: { modifiers: ["cmd", "shift"], key: "arrowDown" },
-                windows: { modifiers: ["ctrl", "shift"], key: "arrowDown" },
-              }}
-            />
-          ) : (
-            <Action.Push
-              title="Navigate Down"
-              icon={Icon.ArrowDown}
-              target={
-                <DirectoryBrowser
-                  directoryPath={file.commandline}
-                  preferences={preferences}
-                  isShowingDetail={isShowingDetail}
-                  onToggleDetails={onToggleDetails}
-                  directoryStack={directoryStack}
-                />
-              }
-              shortcut={{
-                macOS: { modifiers: ["cmd", "shift"], key: "arrowDown" },
-                windows: { modifiers: ["ctrl", "shift"], key: "arrowDown" },
-              }}
-            />
-          ))}
-      </ActionPanel.Section>
+      {children && <>{children}</>}
     </ActionPanel>
   );
 }

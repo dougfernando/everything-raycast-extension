@@ -34,4 +34,5 @@ export const KNOWN_TEXT_EXTENSIONS = new Set([
   ".properties",
 ]);
 
+// Known executable file extensions for fast path detection
 export const KNOWN_EXECUTABLE_EXTENSIONS = new Set([".com", ".exe", ".bat", ".cmd", ".vbs", ".msi"]);

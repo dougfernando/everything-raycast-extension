@@ -1,20 +1,19 @@
-import { Icon, List } from "@raycast/api";
+import { Action, Icon, List, useNavigation } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
 import { FileInfo, Preferences } from "../types";
 import { loadDirectoryContents } from "../services/fileOperations";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { basename, dirname } from "path";
 import { formatBytes } from "../utils/file";
 import { FileActionPanel } from "./FileActionPanel";
 import { FileDetailMetadata } from "./FileDetailMetadata";
-import { useDirectoryStack } from "../hooks/useDirectoryStack";
 
 interface DirectoryBrowserProps {
   directoryPath: string;
   preferences: Preferences;
   isShowingDetail: boolean;
   onToggleDetails: () => void;
-  directoryStack: ReturnType<typeof useDirectoryStack>;
+  previousDir?: string;
 }
 
 export function DirectoryBrowser({
@@ -22,17 +21,10 @@ export function DirectoryBrowser({
   preferences,
   isShowingDetail,
   onToggleDetails,
-  directoryStack,
+  previousDir,
 }: DirectoryBrowserProps) {
   const [selectedFile, setSelectedFile] = useState<FileInfo | null>(null);
-
-  useEffect(() => {
-    directoryStack.push(directoryPath);
-    return () => {
-      console.log("DirectoryBrowser unmounting, popping directory stack");
-      directoryStack.pop();
-    };
-  }, []);
+  const { pop } = useNavigation();
 
   const { data: directoryContents, isLoading } = useCachedPromise(
     async (path: string) => {
@@ -80,14 +72,68 @@ export function DirectoryBrowser({
             },
           ]}
           actions={
-            <FileActionPanel
-              file={item}
-              directory={directoryPath}
-              preferences={preferences}
-              isShowingDetail={isShowingDetail}
-              onToggleDetails={onToggleDetails}
-              directoryStack={directoryStack}
-            />
+            <FileActionPanel file={item} preferences={preferences} onToggleDetails={onToggleDetails}>
+              {dirname(directoryPath) !== directoryPath &&
+                (previousDir && dirname(directoryPath) === previousDir ? (
+                  <Action
+                    title="Navigate Up"
+                    icon={Icon.ArrowUp}
+                    onAction={() => pop()}
+                    shortcut={{
+                      macOS: { modifiers: ["cmd", "shift"], key: "arrowUp" },
+                      windows: { modifiers: ["ctrl", "shift"], key: "arrowUp" },
+                    }}
+                  />
+                ) : (
+                  <Action.Push
+                    title="Navigate Up"
+                    icon={Icon.ArrowUp}
+                    target={
+                      <DirectoryBrowser
+                        directoryPath={dirname(directoryPath)}
+                        preferences={preferences}
+                        isShowingDetail={isShowingDetail}
+                        onToggleDetails={onToggleDetails}
+                        previousDir={directoryPath}
+                      />
+                    }
+                    shortcut={{
+                      macOS: { modifiers: ["cmd", "shift"], key: "arrowUp" },
+                      windows: { modifiers: ["ctrl", "shift"], key: "arrowUp" },
+                    }}
+                  />
+                ))}
+              {item.isDirectory &&
+                (previousDir && item.commandline === previousDir ? (
+                  <Action
+                    title="Navigate Down"
+                    icon={Icon.ArrowDown}
+                    onAction={() => pop()}
+                    shortcut={{
+                      macOS: { modifiers: ["cmd", "shift"], key: "arrowDown" },
+                      windows: { modifiers: ["ctrl", "shift"], key: "arrowDown" },
+                    }}
+                  />
+                ) : (
+                  <Action.Push
+                    title="Navigate Down"
+                    icon={Icon.ArrowDown}
+                    target={
+                      <DirectoryBrowser
+                        directoryPath={item.commandline}
+                        preferences={preferences}
+                        isShowingDetail={isShowingDetail}
+                        onToggleDetails={onToggleDetails}
+                        previousDir={directoryPath}
+                      />
+                    }
+                    shortcut={{
+                      macOS: { modifiers: ["cmd", "shift"], key: "arrowDown" },
+                      windows: { modifiers: ["ctrl", "shift"], key: "arrowDown" },
+                    }}
+                  />
+                ))}
+            </FileActionPanel>
           }
           detail={isShowingDetail && <FileDetailMetadata file={selectedFile || item} />}
         />

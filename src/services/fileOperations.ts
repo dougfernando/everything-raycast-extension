@@ -1,7 +1,7 @@
 import { open, showToast, Toast, Clipboard } from "@raycast/api";
 import { readdir, stat } from "fs/promises";
 import { basename, dirname, join } from "path";
-import { parseEsDate } from "../utils/file";
+import { isExecutableFile, parseEsDate } from "../utils/file";
 import { FileInfo, Preferences } from "../types";
 import { promisify } from "util";
 import { exec, execFile } from "child_process";
@@ -127,7 +127,7 @@ export async function openFileFound(fileInfo: FileInfo) {
       error instanceof Error &&
       (error.message.includes("The requested operation requires elevation.") ||
         error.message.includes("请求的操作需要提升。")) &&
-      fileInfo.commandline.toLowerCase().endsWith(".exe")
+      isExecutableFile(fileInfo.commandline)
     ) {
       await runAsAdministrator(fileInfo.commandline);
       return;

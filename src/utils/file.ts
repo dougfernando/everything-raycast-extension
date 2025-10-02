@@ -88,4 +88,3 @@ export function parseEsDate(dateStr: string): Date | undefined {
   // JavaScript Date constructor expects month to be 0-indexed
   return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
 }
- 
