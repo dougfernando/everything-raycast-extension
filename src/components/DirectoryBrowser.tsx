@@ -2,7 +2,7 @@ import { Action, Icon, List, useNavigation } from "@raycast/api";
 import { useCachedPromise } from "@raycast/utils";
 import { FileInfo, Preferences } from "../types";
 import { loadDirectoryContents } from "../services/fileOperations";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { basename, dirname } from "path";
 import { formatBytes } from "../utils/file";
 import { FileActionPanel } from "./FileActionPanel";
@@ -26,26 +26,20 @@ export function DirectoryBrowser({
   const [selectedFile, setSelectedFile] = useState<FileInfo | null>(null);
   const { pop } = useNavigation();
 
-  const { data: directoryContents, isLoading } = useCachedPromise(
-    async (path: string) => {
-      return loadDirectoryContents(path);
-    },
+  const { data: directoryContents = [], isLoading } = useCachedPromise(
+    (path: string) => loadDirectoryContents(path),
     [directoryPath],
-    {
-      initialData: [],
-    },
+    { initialData: [] as FileInfo[] },
   );
 
-  async function onSelectionChange(itemId: string | null) {
-    if (!itemId) {
-      return;
-    }
-
-    const fileInfo = directoryContents.find((file) => file.commandline === itemId);
-    if (fileInfo) {
+  const onSelectionChange = useCallback(
+    (itemId: string | null) => {
+      if (!itemId) return;
+      const fileInfo = directoryContents.find((file) => file.commandline === itemId) || null;
       setSelectedFile(fileInfo);
-    }
-  }
+    },
+    [directoryContents],
+  );
 
   return (
     <List
@@ -59,9 +53,9 @@ export function DirectoryBrowser({
         description={`No contents found in ${directoryPath}`}
         icon={Icon.Folder}
       />
-      {directoryContents.map((item, index) => (
+      {directoryContents.map((item) => (
         <List.Item
-          key={`${item.commandline}-${index}`}
+          key={item.commandline}
           id={item.commandline}
           title={item.name}
           subtitle={isShowingDetail ? dirname(item.commandline) : undefined}
