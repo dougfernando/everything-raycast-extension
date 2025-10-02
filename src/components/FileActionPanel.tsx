@@ -28,23 +28,9 @@ export function FileActionPanel({
 }: FileActionPanelProps) {
   if (!file) return null;
 
-  const [isExecutable, setIsExecutable] = useState<boolean>(false);
-  const openFolderAsDefault = preferences?.openFolderAsDefault;
   const { pop: navigateBack } = useNavigation();
-
-  useEffect(() => {
-    async function checkIfExecutable() {
-      setIsExecutable(false);
-
-      if (file) {
-        const result = await isExecutableFile(file.commandline);
-        setIsExecutable(result);
-      }
-    }
-
-    checkIfExecutable();
-  }, [file]);
-
+  const openFolderAsDefault = preferences?.openFolderAsDefault;
+  const isExecutable = isExecutableFile(file.commandline);
   const directoryToCheck = directory || file.commandline;
   const isBaseDirectory = dirname(directoryToCheck) === directoryToCheck;
 

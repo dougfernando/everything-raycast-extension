@@ -17,7 +17,7 @@ export async function isTextFile(filePath: string): Promise<boolean> {
   }
 }
 
-export async function isExecutableFile(filePath: string): Promise<boolean> {
+export function isExecutableFile(filePath: string): boolean {
   const ext = extname(filePath).toLowerCase();
   return KNOWN_EXECUTABLE_EXTENSIONS.has(ext);
 }
