@@ -72,52 +72,56 @@ export function SearchResult({ preferences, searchText, onSearchTextChange }: Se
       {searchResults.map((file) => (
         <List.Item
           key={file.commandline}
-            id={file.commandline}
-            title={file.name}
-            subtitle={isShowingDetail ? basename(dirname(file.commandline)) : truncatePath(dirname(file.commandline))}
-            icon={{ fileIcon: file.commandline }}
-            accessories={[{ text: file.isDirectory ? "Folder" : formatBytes(file.size || 0) }]}
-            actions={
-              <FileActionPanel file={file} preferences={preferences} onToggleDetails={onToggleDetails}>
-                {dirname(file.commandline) !== file.commandline && (
-                  <Action.Push
-                    title="Navigate Up"
-                    icon={Icon.ArrowUp}
-                    target={
-                      <DirectoryBrowser
-                        directoryPath={dirname(file.commandline)}
-                        preferences={preferences}
-                        previousDir={file.commandline}
-                        isShowingDetail={isShowingDetail}
-                        onToggleDetails={onToggleDetails}
-                      />
-                    }
-                    shortcut={{
-                      macOS: { modifiers: ["cmd", "shift"], key: "arrowUp" },
-                      windows: { modifiers: ["ctrl", "shift"], key: "arrowUp" },
-                    }}
-                  />
-                )}
+          id={file.commandline}
+          title={file.name}
+          subtitle={isShowingDetail ? basename(dirname(file.commandline)) : truncatePath(dirname(file.commandline))}
+          icon={{ fileIcon: file.commandline }}
+          accessories={[{ text: file.isDirectory ? "Folder" : formatBytes(file.size || 0) }]}
+          actions={
+            <FileActionPanel file={file} preferences={preferences} onToggleDetails={onToggleDetails}>
+              {dirname(file.commandline) !== file.commandline && (
                 <Action.Push
-                  title="Navigate Down"
-                  icon={Icon.ArrowDown}
+                  title="Navigate up"
+                  icon={Icon.ArrowUp}
                   target={
                     <DirectoryBrowser
-                      directoryPath={file.commandline}
+                      directoryPath={dirname(file.commandline)}
                       preferences={preferences}
-                      previousDir={dirname(file.commandline)}
+                      previousDir={file.commandline}
                       isShowingDetail={isShowingDetail}
                       onToggleDetails={onToggleDetails}
                     />
                   }
                   shortcut={{
-                    macOS: { modifiers: ["cmd", "shift"], key: "arrowDown" },
-                    windows: { modifiers: ["ctrl", "shift"], key: "arrowDown" },
+                    macOS: { modifiers: ["cmd", "shift"], key: "arrowUp" },
+                    windows: { modifiers: ["ctrl", "shift"], key: "arrowUp" },
                   }}
                 />
-              </FileActionPanel>
-            }
-            detail={isShowingDetail && <FileDetailMetadata file={selectedFile?.commandline === file.commandline ? selectedFile : file} />}
+              )}
+              <Action.Push
+                title="Navigate Down"
+                icon={Icon.ArrowDown}
+                target={
+                  <DirectoryBrowser
+                    directoryPath={file.commandline}
+                    preferences={preferences}
+                    previousDir={dirname(file.commandline)}
+                    isShowingDetail={isShowingDetail}
+                    onToggleDetails={onToggleDetails}
+                  />
+                }
+                shortcut={{
+                  macOS: { modifiers: ["cmd", "shift"], key: "arrowDown" },
+                  windows: { modifiers: ["ctrl", "shift"], key: "arrowDown" },
+                }}
+              />
+            </FileActionPanel>
+          }
+          detail={
+            isShowingDetail && (
+              <FileDetailMetadata file={selectedFile?.commandline === file.commandline ? selectedFile : file} />
+            )
+          }
         />
       ))}
     </List>
