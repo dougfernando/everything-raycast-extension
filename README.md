@@ -4,7 +4,7 @@
 
 *Quick demo showing the extension in action*
 
-![Extension Screenshots](./metadata/screenshot1.png)
+![Extension Screenshots](./metadata/everything-search-1.png)
 
 *Store-ready screenshot showing the main search interface*
 
