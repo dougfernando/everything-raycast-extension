@@ -16,6 +16,8 @@ export function FileDetailMetadata({ file }: FileDetailMetadataProps) {
   useEffect(() => {
     async function loadPreview() {
       try {
+        if (file?.isDirectory) return;
+
         const canPreview = await isFilePreviewable(file!.commandline, file!.size);
 
         if (canPreview) {
@@ -40,8 +42,12 @@ export function FileDetailMetadata({ file }: FileDetailMetadataProps) {
           <List.Item.Detail.Metadata.Label title="Name" text={file.name} />
           <List.Item.Detail.Metadata.Label title="Where" text={file.commandline} />
           <List.Item.Detail.Metadata.Separator />
-          {file.size !== undefined && <List.Item.Detail.Metadata.Label title="Size" text={formatBytes(file.size)} />}
-          {file.size !== undefined && <List.Item.Detail.Metadata.Separator />}
+          {file.size !== undefined && (
+            <>
+              <List.Item.Detail.Metadata.Label title="Size" text={formatBytes(file.size)} />
+              <List.Item.Detail.Metadata.Separator />
+            </>
+          )}
           {file.dateCreated && (
             <List.Item.Detail.Metadata.Label title="Created" text={file.dateCreated.toLocaleString()} />
           )}

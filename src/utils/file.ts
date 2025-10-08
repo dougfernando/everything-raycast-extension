@@ -29,7 +29,7 @@ export async function isFilePreviewable(filePath: string, fileSize?: number): Pr
   if (KNOWN_TEXT_EXTENSIONS.has(ext)) return true;
 
   // Unknown extension or no extension - content detection for small files only
-  if ((!ext || !KNOWN_TEXT_EXTENSIONS.has(ext)) && fileSize && fileSize < 10000) {
+  if (!KNOWN_TEXT_EXTENSIONS.has(ext) && fileSize && fileSize < 10000) {
     return await isTextFile(filePath);
   }
 

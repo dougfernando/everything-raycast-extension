@@ -98,23 +98,25 @@ export function SearchResult({ preferences, searchText, onSearchTextChange }: Se
                   }}
                 />
               )}
-              <Action.Push
-                title="Navigate Down"
-                icon={Icon.ArrowDown}
-                target={
-                  <DirectoryBrowser
-                    directoryPath={file.commandline}
-                    preferences={preferences}
-                    previousDir={dirname(file.commandline)}
-                    isShowingDetail={isShowingDetail}
-                    onToggleDetails={onToggleDetails}
-                  />
-                }
-                shortcut={{
-                  macOS: { modifiers: ["cmd", "shift"], key: "arrowDown" },
-                  windows: { modifiers: ["ctrl", "shift"], key: "arrowDown" },
-                }}
-              />
+              {file.isDirectory && (
+                <Action.Push
+                  title="Navigate Down"
+                  icon={Icon.ArrowDown}
+                  target={
+                    <DirectoryBrowser
+                      directoryPath={file.commandline}
+                      preferences={preferences}
+                      previousDir={dirname(file.commandline)}
+                      isShowingDetail={isShowingDetail}
+                      onToggleDetails={onToggleDetails}
+                    />
+                  }
+                  shortcut={{
+                    macOS: { modifiers: ["cmd", "shift"], key: "arrowDown" },
+                    windows: { modifiers: ["ctrl", "shift"], key: "arrowDown" },
+                  }}
+                />
+              )}
             </FileActionPanel>
           }
           detail={

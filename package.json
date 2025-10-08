@@ -51,7 +51,7 @@
       "description": "Choose default sorting applied to all query results.",
       "type": "dropdown",
       "required": false,
-      "default": "-sort name -sort-ascending",
+      "default": "-sort name-ascending",
       "data": [
         {
           "title": "Name (A-Z)",

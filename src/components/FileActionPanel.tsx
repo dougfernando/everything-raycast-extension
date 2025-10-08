@@ -13,7 +13,7 @@ interface FileActionPanelProps {
 export function FileActionPanel({ file, preferences, onToggleDetails, children }: FileActionPanelProps) {
   if (!file) return null;
 
-  const openFolderAsDefault = preferences?.openFolderAsDefault;
+  const openFolderAsDefault = preferences.openFolderAsDefault;
   const isExecutable = isExecutableFile(file.commandline);
 
   return (
@@ -69,7 +69,10 @@ export function FileActionPanel({ file, preferences, onToggleDetails, children }
           title="Copy File"
           icon={Icon.Clipboard}
           onAction={() => copyFileWithApi(file)}
-          shortcut={{ modifiers: ["ctrl", "shift"], key: "." }}
+          shortcut={{
+            macOS: { modifiers: ["cmd", "shift"], key: "." },
+            windows: { modifiers: ["ctrl", "shift"], key: "." },
+          }}
         />
         <Action.CopyToClipboard
           title="Copy Name"
