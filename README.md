@@ -1,12 +1,8 @@
 # Everything Extension for Raycast (Windows)
 
-![Demo GIF](./media/demo.gif)
+![Screenshot showing the main search interface](./metadata/everything-search-1.png)
 
-*Quick demo showing the extension in action*
-
-![Extension Screenshots](./metadata/everything-search-1.png)
-
-*Store-ready screenshot showing the main search interface*
+![Quick demo showing the extension in action](./media/demo.gif)
 
 A powerful Raycast extension that integrates with Everything CLI to provide lightning-fast file system search and navigation on Windows. Transform your file discovery workflow with instant search results and comprehensive directory browsing capabilities.
 
@@ -46,24 +42,19 @@ A powerful Raycast extension that integrates with Everything CLI to provide ligh
 
 ## 📦 Installation
 
-### Prerequisites
-1. **Node.js**: Install the latest version
-   ```bash
-   winget install -e --id OpenJS.NodeJS
-   ```
-
-2. **Everything CLI**: Install the command-line interface for Everything
+1. **Install Everything CLI**: Install the command-line interface for Everything
    ```bash
    winget install --id=voidtools.Everything.Cli -e
    ```
 
-3. **Everything Desktop App**: Ensure Everything is installed and running (for indexing)
+2. **Install Everything Desktop App**: Ensure Everything is installed and running (for indexing)
    - Download from [voidtools.com](https://www.voidtools.com/)
-   - Or install via: `winget install voidtools.Everything`
+   - Or install via: 
+   ```bash
+   winget install voidtools.Everything
+   ```
 
-### Extension Installation
-
-This extension is available through the Raycast store. Search for "Everything" in the Raycast store to install it.
+3. **Install Extension**: This extension is available through the Raycast store. Search for "Everything Search" in the Raycast store to install it.
 
 ## 🛠️ Configuration
 
@@ -88,6 +79,22 @@ Access the extension preferences in Raycast to customize:
 
 ## 🔧 Development
 
+### Setting up Environment
+
+If you want to contribute to this extension or run it locally:
+
+1. **Node.js**: Install the latest version
+   ```bash
+   winget install -e --id OpenJS.NodeJS
+   ```
+
+2. **Clone and Setup**: Clone the repository and install dependencies
+   ```bash
+   git clone <repository-url>
+   cd everything-raycast-extension
+   npm install
+   ```
+
 ### Available Scripts
 - **Development**: `npm run dev` - Start development mode with hot reload
 - **Build**: `npm run build` - Build extension for distribution
@@ -100,14 +107,6 @@ Access the extension preferences in Raycast to customize:
 - **Everything CLI Integration**: Uses Windows `es.exe` for file indexing and search
 - **File Preview System**: Intelligent text file detection and preview for 20+ file types
 - **Windows-Specific Features**: PowerShell integration for elevated permissions
-
-### Store Compliance
-This extension is fully compliant with Raycast store guidelines:
-- ✅ Proper naming conventions and descriptions
-- ✅ Required metadata and CHANGELOG.md
-- ✅ Store-quality screenshots (2000x1250px)
-- ✅ ESLint and Prettier compliance
-- ✅ Latest Raycast API version
 
 ## 📝 Notes
 
