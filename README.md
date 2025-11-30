@@ -54,8 +54,6 @@ A powerful Raycast extension that integrates with Everything CLI to provide ligh
    winget install voidtools.Everything
    ```
 
-3. **Install Extension**: This extension is available through the Raycast store. Search for "Everything Search" in the Raycast store to install it.
-
 ## 🛠️ Configuration
 
 Access the extension preferences in Raycast to customize:
