@@ -6,39 +6,8 @@
 
 A powerful Raycast extension that integrates with Everything CLI to provide lightning-fast file system search and navigation on Windows. Transform your file discovery workflow with instant search results and comprehensive directory browsing capabilities.
 
-> **Attribution**: Initially inspired by the [PuttTim/windows-terminal](https://github.com/PuttTim/windows-terminal) project structure & setup.
-
-## 🚀 Features
-
-### Lightning-Fast Search
-- **Instant File Discovery**: Search your entire file system using Everything's powerful indexing engine
-- **Real-time Results**: Get search results as you type with intelligent throttling
-- **Configurable Search**: Set minimum character thresholds to optimize performance
-- **Smart Filtering**: Supports all Everything CLI command-line arguments for advanced filtering
-
-### Comprehensive Directory Navigation
-- **Browse Directory Action**: Navigate into directories directly from search results
-- **Recursive Exploration**: Browse through nested folder structures seamlessly
-- **Smart File Detection**: Automatic distinction between files and directories
-- **Native System Icons**: Uses Windows file icons for familiar visual experience
-
-### Rich File Interactions
-- **File Preview**: Instant preview of text files (supports 20+ file types including .txt, .md, .json, .js, .ts, .py, .sql, etc.)
-- **Multiple Open Options**: Open files with default applications or show in Windows Explorer
-- **Administrator Support**: Run executable files as administrator when needed
-- **Custom File Explorer**: Configure custom file manager commands
-
-### Flexible Actions & Shortcuts
-- **Copy Operations**: Copy files, file names, or full paths to clipboard
-- **Configurable Default Action**: Choose between opening files or showing folders as primary action
-- **Keyboard Shortcuts**: Full keyboard navigation support
-- **Context-Aware Actions**: Different actions available based on file type (file vs directory)
-
-### Advanced Configuration
-- **Custom Everything Path**: Specify custom es.exe location
-- **Search Preferences**: Configure minimum characters before search triggers
-- **File Explorer Integration**: Set custom file manager commands with placeholder support
-- **Action Preferences**: Choose default behavior for file/folder interactions
+> **Attribution**: Initially inspired by the [PuttTim/windows-terminal](https://github.com/PuttTim/windows-terminal) project structure & setup. <br>
+> **Attribution**: File search on servers ported from [anastasiy_safari/raycast-everything-ftp](https://github.com/anastasiuspernat/everything-search)
 
 ## 📦 Installation
 
@@ -63,6 +32,35 @@ Access the extension preferences in Raycast to customize:
 - **Default Action**: Choose between opening files or folders as primary action
 - **Default Sort**: Choose default sorting method for search results
 - **Search Threshold**: Minimum characters required before search starts (default: 3)
+
+### Configure Everything search on servers (ETP/FTP)
+
+Search files & folders on multiple Windows Everything ETP/FTP servers from Raycast. 
+
+1. Enable Tools > Options > ETP/FTP Server in Everything on your Windows computers.
+2. Configure the servers in the extension settings (see below).
+3. Use *search-servers* command followed by the mask. (this command is disabled by default)
+
+Configure the servers in the extension settings using the following format:
+
+```json
+[
+  {
+    "name": "Server 1",
+    "host": "server-url",
+    "port": 21,
+    "user": "username",
+    "pass": "password"
+  },
+  {
+    "name": "Server 2",
+    "host": "server-url",
+    "port": 21,
+    "user": "username",
+    "pass": "password"
+  }
+]
+```
 
 ## 💡 Usage Tips
 
