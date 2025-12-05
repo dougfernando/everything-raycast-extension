@@ -1,12 +1,15 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "everything-ext",
+  "name": "everything-search",
   "title": "Everything Search",
-  "description": "Search files using Everything-CLI on Windows.",
+  "description": "Search files using Everything on Windows.",
   "icon": "extension-icon.png",
   "author": "doug_fernando",
   "contributors": [
     "laurynas_gailius"
+  ],
+  "pastContributors": [
+    "anastasiy_safari"
   ],
   "license": "MIT",
   "commands": [
@@ -15,6 +18,32 @@
       "title": "Search Files",
       "description": "Search files using Everything",
       "mode": "view"
+    },
+    {
+      "name": "search-servers",
+      "title": "Search Files on servers",
+      "subtitle": "Everything",
+      "description": "Find Files from Everything ETP/FTP servers by Mask",
+      "mode": "view",
+      "disabledByDefault": true,
+      "arguments": [
+        {
+          "name": "mask",
+          "placeholder": "File mask (e.g. *.jpg)",
+          "type": "text",
+          "required": false
+        }
+      ],
+      "preferences": [
+        {
+          "name": "serversJSON",
+          "title": "Everything Servers Configuration",
+          "description": "JSON array of ETP/FTP server configurations",
+          "type": "textfield",
+          "required": true,
+          "placeholder": "[{\"name\":\"...\",\"host\":\"...\",\"port\":21,\"user\":\"...\",\"pass\":\"...\"}]"
+        }
+      ]
     }
   ],
   "preferences": [
@@ -162,7 +191,8 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.103.0",
-    "@raycast/utils": "^2.2.1"
+    "@raycast/utils": "^2.2.1",
+    "basic-ftp": "^5.0.5"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^2.0.4",
