@@ -187,6 +187,15 @@
       "type": "textfield",
       "required": false,
       "default": "3"
+    },
+    {
+      "name": "useNativeSDK",
+      "title": "Use SDK (Experimental)",
+      "label": "Use SDK (Experimental)",
+      "description": "Use the Everything SDK instead of es.exe CLI. Requires the native node module to be available.",
+      "type": "checkbox",
+      "required": false,
+      "default": false
     }
   ],
   "dependencies": {

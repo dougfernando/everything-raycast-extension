@@ -76,15 +76,3 @@ export function truncatePath(path: string, maxLength = 50): string {
   // If extremely long, just show first two parts with ellipsis
   return `${first}${pathSeparator}${second}${pathSeparator}${ellipsis}`;
 }
-
-export function parseEsDate(dateStr: string): Date | undefined {
-  if (!dateStr) return undefined;
-
-  // Parse date format: "22/07/2025 16:18"
-  const match = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{1,2})$/);
-  if (!match) return undefined;
-
-  const [, day, month, year, hour, minute] = match;
-  // JavaScript Date constructor expects month to be 0-indexed
-  return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
-}

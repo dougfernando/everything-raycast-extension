@@ -13,4 +13,5 @@ export interface Preferences {
   defaultSort: string;
   openFolderAsDefault?: boolean;
   minCharsToSearch?: string;
+  useNativeSDK?: boolean;
 }
