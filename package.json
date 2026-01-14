@@ -20,12 +20,12 @@
       "mode": "view"
     },
     {
-      "name": "search-servers",
-      "title": "Search Files on servers",
+      "name": "evy",
+      "title": "Search Files on Servers",
       "subtitle": "Everything",
       "description": "Find Files from Everything ETP/FTP servers by Mask",
       "mode": "view",
-      "disabledByDefault": true,
+      "disabledByDefault": false,
       "arguments": [
         {
           "name": "mask",
@@ -51,7 +51,7 @@
       "name": "esExePath",
       "title": "Everything CLI Path (es.exe)",
       "description": "Custom path to es.exe. Leave empty to use system PATH.",
-      "type": "textfield",
+      "type": "file",
       "required": false,
       "default": "",
       "placeholder": "C:\\Program Files\\Everything\\es.exe"
@@ -189,10 +189,27 @@
       "default": "3"
     },
     {
+      "name": "maxResults",
+      "title": "Maximum Results to Fetch",
+      "description": "Maximum number of search results to retrieve per query.",
+      "type": "textfield",
+      "required": false,
+      "default": "100"
+    },
+    {
+      "name": "useRegex",
+      "label": "Use Regular Expressions",
+      "title": "Use Regular Expressions",
+      "description": "Enable to interpret search queries as regular expressions.",
+      "type": "checkbox",
+      "required": false,
+      "default": false
+    },
+    {
       "name": "useNativeSDK",
       "title": "Use SDK (Experimental)",
       "label": "Use SDK (Experimental)",
-      "description": "Use the Everything SDK instead of es.exe CLI. Requires the native node module to be available.",
+      "description": "Use the Everything SDK instead of es.exe CLI. Provides better performance, but may not be supported for all systems.",
       "type": "checkbox",
       "required": false,
       "default": false

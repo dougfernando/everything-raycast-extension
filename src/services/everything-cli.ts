@@ -12,13 +12,15 @@ export async function searchFilesWithCLI(searchText: string, preferences: Prefer
     return [];
   }
 
-  const { esExePath, defaultSort } = preferences;
+  const { esExePath, defaultSort, maxResults, useRegex } = preferences;
 
   try {
     const esCommand = esExePath || "es.exe";
+    const maxResultsCount = Number(maxResults) || 100;
+    const searchQuery = useRegex ? `-r "${searchText}"` : `${searchText}`;
 
     // Use es.exe with CSV output format to get file info in one call
-    const command = `chcp 65001 > nul && "${esCommand}" -n 100 -csv -name -filename-column -size -date-created -date-modified ${defaultSort} ${searchText}`;
+    const command = `chcp 65001 > nul && "${esCommand}" -n ${maxResultsCount} -csv -name -filename-column -size -date-created -date-modified ${defaultSort} ${searchQuery}`;
 
     const { stdout } = await execAsync(command);
 

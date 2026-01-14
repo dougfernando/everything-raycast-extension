@@ -2,16 +2,8 @@ import { showToast, Toast, environment } from "@raycast/api";
 import { join } from "path";
 import { FileInfo, Preferences } from "../types";
 import { EverythingSDK } from "../types/everything-sdk";
-import {
-  EVERYTHING_REQUEST_FILE_NAME,
-  EVERYTHING_REQUEST_PATH,
-  EVERYTHING_REQUEST_SIZE,
-  EVERYTHING_REQUEST_DATE_CREATED,
-  EVERYTHING_REQUEST_DATE_MODIFIED,
-  mapSortPreferenceToSDK,
-  getErrorMessage,
-} from "../utils/everything-sdk/everything-sdk-constants";
-import { fileTimeToDate } from "../utils/everything-sdk/everything-sdk-utils";
+import { RequestFlags } from "../utils/everything-sdk/everything-sdk-constants";
+import { fileTimeToDate, mapSortPreferenceToSDK, getErrorMessage } from "../utils/everything-sdk/everything-sdk-utils";
 
 const { platform, arch } = process;
 
@@ -29,16 +21,9 @@ switch (platform) {
           loadError = e as Error;
         }
         break;
-      case "ia32":
-        try {
-          everythingSDK = require(join(environment.assetsPath, "/native/everything-search-node-32.node"));
-        } catch (e) {
-          loadError = e as Error;
-        }
-        break;
       case "arm64":
         try {
-          everythingSDK = require(join(environment.assetsPath, "/native/everything-search-node-arm64.node"));
+          everythingSDK = require(join(environment.assetsPath, "/native/everything-search-node-arm.node"));
         } catch (e) {
           loadError = e as Error;
         }
@@ -71,18 +56,23 @@ export async function searchFilesWithSDK(searchText: string, preferences: Prefer
 
   try {
     // Set configured parameters for search
+    const maxResultsCount = Number(preferences.maxResults) || 100;
     everythingSDK.setSearch(searchText);
-    everythingSDK.setMax(100);
+    everythingSDK.setMax(maxResultsCount);
 
     const sortType = mapSortPreferenceToSDK(preferences.defaultSort);
     everythingSDK.setSort(sortType);
 
+    if(preferences.useRegex) {
+      everythingSDK.setRegex(true);
+    }
+
     const requestFlags =
-      EVERYTHING_REQUEST_FILE_NAME |
-      EVERYTHING_REQUEST_PATH |
-      EVERYTHING_REQUEST_SIZE |
-      EVERYTHING_REQUEST_DATE_CREATED |
-      EVERYTHING_REQUEST_DATE_MODIFIED;
+      RequestFlags.FILE_NAME |
+      RequestFlags.PATH |
+      RequestFlags.SIZE |
+      RequestFlags.DATE_CREATED |
+      RequestFlags.DATE_MODIFIED;
 
     everythingSDK.setRequestFlags(requestFlags);
 
