@@ -21,12 +21,15 @@ export function SearchResult({ preferences, searchText, onSearchTextChange }: Se
   const minChars: number = Number(preferences?.minCharsToSearch) || 3;
 
   const { data: searchResults = [], isLoading } = useCachedPromise(
-    (text: string, prefs: Preferences | null): Promise<FileInfo[]> => {
-      if (!prefs || text.length < minChars) return Promise.resolve([]);
+    (text: string, prefs: Preferences): Promise<FileInfo[]> => {
+      if (text.length < minChars) return Promise.resolve([]);
       return loadFilesList(text, prefs);
     },
     [searchText, preferences],
-    { initialData: [] as FileInfo[] },
+    {
+      execute: searchText.length >= minChars,
+      initialData: [] as FileInfo[],
+    },
   );
 
   const onSelectionChange = useCallback(
