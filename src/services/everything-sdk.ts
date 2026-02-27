@@ -1,51 +1,31 @@
-import { showToast, Toast, environment } from "@raycast/api";
-import { join } from "path";
+import { getPreferenceValues, showToast, Toast } from "@raycast/api";
 import { FileInfo, Preferences } from "../types";
-import { EverythingSDK } from "../types/everything-sdk";
-import { RequestFlags } from "../utils/everything-sdk/everything-sdk-constants";
-import { fileTimeToDate, mapSortPreferenceToSDK, getErrorMessage } from "../utils/everything-sdk/everything-sdk-utils";
+import * as sdk from "../lib/everything";
+import { getErrorMessage, mapSortPreferenceToSDK } from "../utils/everything-sdk-utils";
+import { RequestFlags } from "../lib/everything-constants";
 
-const { platform, arch } = process;
+const { useSdk } = getPreferenceValues<Preferences>();
 
-let everythingSDK: EverythingSDK | null = null;
 let loadError: Error | null = null;
 
-// Load the appropriate native module based on platform and architecture
-switch (platform) {
-  case "win32":
-    switch (arch) {
-      case "x64":
-        try {
-          everythingSDK = require(join(environment.assetsPath, "/native/everything-search-node-64.node"));
-        } catch (e) {
-          loadError = e as Error;
-        }
-        break;
-      case "arm64":
-        try {
-          everythingSDK = require(join(environment.assetsPath, "/native/everything-search-node-arm.node"));
-        } catch (e) {
-          loadError = e as Error;
-        }
-        break;
-      default:
-        loadError = new Error(`Unsupported architecture on Windows: ${arch}`);
+if (useSdk) {
+  try {
+    sdk.load();
+  } catch (error) {
+    if (error instanceof Error) {
+      loadError = error;
+    } else {
+      loadError = new Error("Unknown error loading Everything SDK");
     }
-    break;
-  default:
-    loadError = new Error(`Unsupported OS: ${platform}, architecture: ${arch}`);
-}
-
-if (loadError) {
-  console.error("Failed to load native Everything SDK:", loadError);
+  }
 }
 
 export async function searchFilesWithSDK(searchText: string, preferences: Preferences): Promise<FileInfo[]> {
   if (!searchText) {
     return [];
   }
-  
-  if (!everythingSDK) {
+
+  if (loadError) {
     await showToast({
       style: Toast.Style.Failure,
       title: "SDK Not Available",
@@ -55,17 +35,13 @@ export async function searchFilesWithSDK(searchText: string, preferences: Prefer
   }
 
   try {
-    // Set configured parameters for search
     const maxResultsCount = Number(preferences.maxResults) || 100;
-    everythingSDK.setSearch(searchText);
-    everythingSDK.setMax(maxResultsCount);
+    sdk.setMax(maxResultsCount);
 
     const sortType = mapSortPreferenceToSDK(preferences.defaultSort);
-    everythingSDK.setSort(sortType);
+    sdk.setSort(sortType);
 
-    if(preferences.useRegex) {
-      everythingSDK.setRegex(true);
-    }
+    sdk.setRegex(preferences.useRegex || false);
 
     const requestFlags =
       RequestFlags.FILE_NAME |
@@ -74,32 +50,36 @@ export async function searchFilesWithSDK(searchText: string, preferences: Prefer
       RequestFlags.DATE_CREATED |
       RequestFlags.DATE_MODIFIED;
 
-    everythingSDK.setRequestFlags(requestFlags);
+    sdk.setRequestFlags(requestFlags);
 
-    const success = everythingSDK.query(true);
+    sdk.setSearch(searchText);
+
+    const success = await sdk.query();
 
     if (!success) {
-      const errorCode = everythingSDK.getLastError();
+      const errorCode = sdk.getLastError();
       throw new Error(getErrorMessage(errorCode));
     }
 
-    const numResults = everythingSDK.getNumResults();
+    const numResults = sdk.getNumResults();
     const results: FileInfo[] = [];
 
     for (let i = 0; i < numResults; i++) {
       try {
-        const fullPath = everythingSDK.getResultFullPathName(i);
-        const fileName = everythingSDK.getResultFileName(i);
-        const isDirectory = everythingSDK.isFolderResult(i);
+        const fullPath = sdk.getResultFullPathName(i);
+        const fileName = sdk.getResultFileName(i);
+        const isDirectory = sdk.isFolderResult(i);
 
-        const sizeValue = !isDirectory ? everythingSDK.getResultSize(i) : null;
+        const sizeValue = !isDirectory ? sdk.getResultSize(i) : null;
         const size = sizeValue !== null ? sizeValue : undefined;
 
-        const dateCreatedValue = everythingSDK.getResultDateCreated(i);
-        const dateModifiedValue = everythingSDK.getResultDateModified(i);
+        const dateCreated = sdk.getResultDateCreated(i) ?? undefined;
+        const dateModified = sdk.getResultDateModified(i) ?? undefined;
 
-        const dateCreated = dateCreatedValue !== null ? fileTimeToDate(dateCreatedValue) : undefined;
-        const dateModified = dateModifiedValue !== null ? fileTimeToDate(dateModifiedValue) : undefined;
+        if (!fullPath || !fileName) {
+          console.warn(`Skipping result ${i} due to missing path or filename.`);
+          continue;
+        }
 
         results.push({
           name: fileName,
@@ -113,16 +93,19 @@ export async function searchFilesWithSDK(searchText: string, preferences: Prefer
         console.error(`Error processing result ${i}:`, error);
       }
     }
+
     return results;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    
+
     await showToast({
       style: Toast.Style.Failure,
       title: "Error Searching Files",
       message: errorMessage,
     });
-    
+
     return [];
+  } finally {
+    sdk.reset();
   }
 }

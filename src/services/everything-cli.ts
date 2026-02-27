@@ -1,26 +1,31 @@
-import { showToast, Toast } from "@raycast/api";
+import { confirmAlert, showToast, Toast } from "@raycast/api";
 import { stat } from "fs/promises";
 import { basename } from "path";
-import { FileInfo, Preferences } from "../types";
 import { promisify } from "util";
 import { exec } from "child_process";
+import { FileInfo, Preferences } from "../types";
+import { downloadCli } from "../utils/download-cli";
 
 const execAsync = promisify(exec);
+
+// Tracks whether a download attempt has already been made this session.
+let cliDownloadAttempted = false;
 
 export async function searchFilesWithCLI(searchText: string, preferences: Preferences): Promise<FileInfo[]> {
   if (!searchText) {
     return [];
   }
 
-  const { esExePath, defaultSort, maxResults, useRegex } = preferences;
+  const { esExePath, defaultSort, maxResults, customCliArgs, useRegex } = preferences;
 
   try {
     const esCommand = esExePath || "es.exe";
     const maxResultsCount = Number(maxResults) || 100;
-    const searchQuery = useRegex ? `-r "${searchText}"` : `${searchText}`;
+
+    const cliArgs = `${customCliArgs?.trim() || ""}${useRegex ? " -r" : ""}`;
 
     // Use es.exe with CSV output format to get file info in one call
-    const command = `chcp 65001 > nul && "${esCommand}" -n ${maxResultsCount} -csv -name -filename-column -size -date-created -date-modified ${defaultSort} ${searchQuery}`;
+    const command = `chcp 65001 > nul && "${esCommand}" -csv -n ${maxResultsCount} -name -filename-column -size -date-created -date-modified ${defaultSort} ${cliArgs} ${searchText}`;
 
     const { stdout } = await execAsync(command);
 
@@ -84,23 +89,52 @@ export async function searchFilesWithCLI(searchText: string, preferences: Prefer
     );
     return results;
   } catch (error) {
+    const errorCode = error && typeof error === "object" && "code" in error ? error.code : undefined;
     const errorMessage = error instanceof Error ? error.message : String(error);
     const hasStderr = error && typeof error === "object" && "stderr" in error;
     const stderr = hasStderr ? String(error.stderr) : "";
 
-    // Check if es.exe command is not recognized (Windows) or not found (Unix-like)
-    if (
+    const isNotFound =
+      errorCode === 1 ||
       stderr.includes("not recognized") ||
       stderr.includes("command not found") ||
-      errorMessage.includes("not recognized")
-    ) {
-      await showToast({
-        style: Toast.Style.Failure,
-        title: esExePath ? "Custom es.exe path not found" : "'es.exe' not found",
-        message: esExePath
-          ? `Cannot find es.exe at: ${esExePath}`
-          : "Please ensure Everything's command-line tool is in your system's PATH or set a custom path in preferences.",
-      });
+      errorMessage.includes("not recognized");
+
+    if (isNotFound) {
+      if (esExePath) {
+        // User configured a custom path that doesn't work
+        await showToast({
+          style: Toast.Style.Failure,
+          title: "Custom es.exe path not found",
+          message: `Cannot find es.exe at: ${esExePath}`,
+        });
+      } else if (!cliDownloadAttempted) {
+        // es.exe not in PATH — offer to download it
+        cliDownloadAttempted = true;
+
+        const shouldDownload = await confirmAlert({
+          title: "ES CLI Not Found",
+          message:
+            "Everything's command-line tool (es.exe) was not found.\n\n" +
+            "Would you like to download and install it from GitHub?",
+          primaryAction: { title: "Download" },
+          dismissAction: { title: "Cancel" },
+        });
+
+        if (shouldDownload) {
+          const installedPath = await downloadCli();
+          if (installedPath) {
+            // Retry the search with the newly installed es.exe
+            return searchFilesWithCLI(searchText, { ...preferences, esExePath: installedPath });
+          }
+        }
+      } else {
+        await showToast({
+          style: Toast.Style.Failure,
+          title: "'es.exe' not found",
+          message: "Please ensure Everything's command-line tool is in your PATH or set a custom path in preferences.",
+        });
+      }
     } else {
       await showToast({
         style: Toast.Style.Failure,
