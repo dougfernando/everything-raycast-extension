@@ -1,6 +1,6 @@
 import { open, showToast, Toast, Clipboard } from "@raycast/api";
 import { readdir, stat } from "fs/promises";
-import { basename, dirname, join } from "path";
+import { dirname, join } from "path";
 import { isExecutableFile } from "../utils/file";
 import { FileInfo, Preferences } from "../types";
 import { promisify } from "util";
@@ -16,8 +16,7 @@ export async function loadFilesList(searchText: string, preferences: Preferences
     return [];
   }
 
-  // Check if user wants to use native SDK
-  if (preferences.useNativeSDK) {
+  if (preferences.useSdk) {
     return searchFilesWithSDK(searchText, preferences);
   } else {
     return searchFilesWithCLI(searchText, preferences);
